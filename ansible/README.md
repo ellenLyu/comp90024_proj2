@@ -13,3 +13,8 @@ password
 * Create Volumes
 * Create Security Groups
 * Create Instances
+
+```bash
+./run-nectar.sh
+```
+
