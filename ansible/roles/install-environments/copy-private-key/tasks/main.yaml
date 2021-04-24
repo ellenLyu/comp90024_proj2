@@ -1,0 +1,5 @@
+- name: copy ssh private key
+  copy:
+    src: "demo-auth.pem"
+    dest: ~/.ssh/demo-auth.pem
+    mode: 0400

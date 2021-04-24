@@ -1,0 +1,34 @@
+---
+- name: Install docker dependencies
+  become: yes
+  apt:
+    name: ['apt-transport-https', 'ca-certificates', 'curl', 'gnupg', 'lsb-release']
+    state: latest
+    install_recommends: no
+    update_cache: yes
+
+- name: Add Docker apt repository key
+  become: yes
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: add docker repo
+  become: yes
+  apt_repository:
+    repo: "deb https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+    state: present
+
+- name: Install docker
+  become: yes
+  apt:
+    name: ['docker-ce']
+    state: latest
+    install_recommends: no
+    update_cache: yes
+
+- name: Install docker-compose
+  become: yes
+  pip:
+    name: ['docker-compose']
+    state: present
