@@ -1,17 +1,37 @@
+import argparse
+import csv
+import database
 import json
-from python import database
+
+
+
 
 DB_AUTH = {"ADDRESS": "localhost", "PORT": "5984", "COUCHDB_USER": "admin", "COUCHDB_PASSWORD": "group27"}
-DB_NAME = 'tweets'
-BATCH_SIZE = 100
+# DB_NAME = 'tweets'
 FILE_PATH = 'files/'
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-mode', type=str, default='csv')
+    parser.add_argument('-filename', type=str, default='dataset1.csv')
+    parser.add_argument('-dbname', type=str, default='covid')
+
+    args = parser.parse_args()
+
+    mode = args.mode
+    filename = args.filename
+    dbname = args.dbname
+
     # 'https://username:password@host:port/'
     url = 'http://{0}:{1}@{2}:{3}/'.format(DB_AUTH["COUCHDB_USER"], DB_AUTH["COUCHDB_PASSWORD"],
                                            DB_AUTH["ADDRESS"], DB_AUTH["PORT"])
-    db = database.Connection(url=url, database_name=DB_NAME)
+    db = database.Connection(url=url, database_name=dbname)
 
-    with open(FILE_PATH + 'tinyTwitter.json', "r") as f:
-        twitter_file = json.load(f)
-    db.insert_tweets(twitter_file['rows'], BATCH_SIZE)
+    if mode == 'twitter':
+        with open(FILE_PATH + filename, "r") as f:
+            twitter_file = json.load(f)
+        db.insert_tweets(twitter_file['rows'])
+    elif mode == 'csv':
+        with open(FILE_PATH + filename, "r") as f:
+            csv_file = csv.reader(f)
+            db.insert_dataset(csv_file)
