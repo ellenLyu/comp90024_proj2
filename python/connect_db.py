@@ -6,7 +6,7 @@ import json
 
 
 
-DB_AUTH = {"ADDRESS": "localhost", "PORT": "5984", "COUCHDB_USER": "admin", "COUCHDB_PASSWORD": "group27"}
+DB_AUTH = {"ADDRESS": "172.26.128.60", "PORT": "5984", "COUCHDB_USER": "admin", "COUCHDB_PASSWORD": "group27"}
 # DB_NAME = 'tweets'
 FILE_PATH = 'files/'
 
