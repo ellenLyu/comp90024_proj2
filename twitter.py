@@ -6,24 +6,28 @@ from tweepy import OAuthHandler
 import json
 import pandas as pd
 import sys
+import argparse
+
 
 print(len(sys.argv))
 print(sys.argv)
+
 
 geo='-37.972566514250005,145.1525293990965,50km'
 tweet_count = 10
 keyword='covid'
 
-#tweet.py -c 1000 -k covid
-try:
-    for i in range(len(sys.argv)):
-        if sys.argv[i] == "-c" :
-            tweet_count = int(sys.argv[i+1])
-        elif sys.argv[i] == "-k":
-            keyword = sys.argv[i+1]
-except:
-    print("Invalid input")
-    sys.exit()
+parser = argparse.ArgumentParser()
+parser.add_argument('-count', type=int, default='10')
+parser.add_argument('-keyword', type=str, default='covid')
+parser.add_argument('-geo', type=str, default='-37.972566514250005,145.1525293990965,50km')
+
+args = parser.parse_args()
+tweet_count = args.count
+keyword = args.keyword
+geo = args.geo
+
+
 
 consumer_key = 'rZFruNsPGW0dztpugftVGj837'  
 consumer_secret = 'L6AzbTcwZZuJYWkBxt5mL7Ern7sKUxHuGyUqKE7WSql9vkRZNG'  
@@ -57,7 +61,7 @@ COLS = ['id','created_at','lang','original text','user_name', 'place', 'place ty
 
 
 
-df = pd.DataFrame(columns=COLS)
+#df = pd.DataFrame(columns=COLS)
 
 
 print("  ")
@@ -70,6 +74,7 @@ for page in tweepy.Cursor(api.search, q=keyword,include_rts=False,geocode=geo).p
                if tweet_count == 0:
                    break
                tweet_count -= 1
+			   
                with open('tweet2.json', 'a') as outfile:
                     #print(tweet._json)
                     #outfile.write(str(tweet._json).replace(u'\xa0', u''))
