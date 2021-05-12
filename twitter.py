@@ -5,6 +5,25 @@ from tweepy.streaming import StreamListener
 from tweepy import OAuthHandler
 import json
 import pandas as pd
+import sys
+
+print(len(sys.argv))
+print(sys.argv)
+
+geo='-37.972566514250005,145.1525293990965,50km'
+tweet_count = 10
+keyword='covid'
+
+#tweet.py -c 1000 -k covid
+try:
+    for i in range(len(sys.argv)):
+        if sys.argv[i] == "-c" :
+            tweet_count = int(sys.argv[i+1])
+        elif sys.argv[i] == "-k":
+            keyword = sys.argv[i+1]
+except:
+    print("Invalid input")
+    sys.exit()
 
 consumer_key = 'rZFruNsPGW0dztpugftVGj837'  
 consumer_secret = 'L6AzbTcwZZuJYWkBxt5mL7Ern7sKUxHuGyUqKE7WSql9vkRZNG'  
@@ -22,8 +41,8 @@ auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)  
 api = tweepy.API(auth,wait_on_rate_limit=True)
 places = api.geo_search(query="melbourne", granularity="city")
-
-
+#print(places)
+#sys.exit()
 
 melb = api.geo_id("01864a8a64df9dc4")
 print(melb)
@@ -35,79 +54,30 @@ for tweet in tweets:
     print(tweet.coordinates,tweet.place)'''
 
 COLS = ['id','created_at','lang','original text','user_name', 'place', 'place type', 'bbx', 'coordinates']
-keyword='covid'
 
-geo='-37.972566514250005,145.1525293990965,50km'
+
+
 df = pd.DataFrame(columns=COLS)
-tweet_count = 200000
 
 
-for page in tweepy.Cursor(api.search, q=keyword,include_rts=False,geocode=geo).pages():
-     while tweet_count > 0:
-          for tweet in page:
-               #print(tweet._json)
+print("  ")
+
+for page in tweepy.Cursor(api.search, q=keyword,include_rts=False,geocode=geo).pages():     
+    while tweet_count > 0:
+        for tweet in page:
+               #print(str(tweet._json))
                print(tweet_count)
-               tweet_json = {}
-              
+               if tweet_count == 0:
+                   break
                tweet_count -= 1
-               with open('tweet.json2', 'a') as outfile:
-                    json.dump(tweet._json, outfile, indent=2)                     
-               try:
-                    coord = tweet['coordinates']['coordinates']
-               except TypeError:
-                    coord = 'no coordinates'
-                                #print(coord)
-                    '''
-                    new_entry = []
+               with open('tweet2.json', 'a') as outfile:
+                    #print(tweet._json)
+                    #outfile.write(str(tweet._json).replace(u'\xa0', u''))
+                    json_str = json.dumps(tweet._json)
+                    outfile.write(json_str)
+                    outfile.write("\n")
+                    #json.dump(tweet._json, outfile)                     
 
-                    #storing all JSON data from twitter API
-                    tweet = tweet._json    
-
-                    #Append the JSON parsed data to the string list:
-
-                    new_entry += [tweet['id'], tweet['created_at'], tweet['lang'], tweet['text'], 
-                                  tweet['user']['name']]
-
-                    #check if place name is available, in case not the entry is named 'no place'
-                    try:
-                        place = tweet['place']['name']
-                    except TypeError:
-                        place = 'no place'
-                    new_entry.append(place)
-
-                    try:
-                        place_type = tweet['place']['place_type']
-                    except TypeError:
-                        place_type = 'na'
-                    new_entry.append(place_type)
-
-                    try:
-                        bbx = tweet['place']['bounding_box']['coordinates']
-                    except TypeError:
-                        bbx = 'na'
-                    new_entry.append(bbx)
-
-                    #check if coordinates is available, in case not the entry is named 'no coordinates'
-                    try:
-                        coord = tweet['coordinates']['coordinates']
-                    except TypeError:
-                        coord = 'no coordinates'
-                    new_entry.append(coord)
-
-                    # wrap up all the data into a data frame
-                    single_tweet_df = pd.DataFrame([new_entry], columns=COLS)
-                    df = df.append(single_tweet_df, ignore_index=True)
-
-                    #get rid of tweets without a place
-                    df_cleaned = df[df.place != 'no place']
-
-print("tweets with place:")
-print(len(df[df.place != 'no place']))
-
-print("tweets with coordinates:")
-print(len(df[df.coordinates != 'no coordinates']))
-
-df_cleaned.to_csv('tweets_'+geo+'.csv', columns=COLS,index=False)'''
+    break                  
 
 
-        
