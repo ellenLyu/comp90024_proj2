@@ -1,0 +1,32 @@
+#mapid { height: 500px; }
+
+
+#map {
+    height: 600px;
+    /* The height is 400 pixels */
+    width: 100%;
+    /* The width is the width of the web page */
+}
+
+#data-value {
+    font-size: 2em;
+    font-weight: bold;
+}
+
+#data-label {
+    font-size: 2em;
+    font-weight: normal;
+    padding-right: 10px;
+}
+
+#data-label:after {
+    content: ":";
+}
+
+#data-box {
+    top: 10px;
+    left: 500px;
+    height: 45px;
+    line-height: 45px;
+    display: none;
+}
