@@ -1,3 +1,19 @@
 proxy_address: http://wwwproxy.unimelb.edu.au:8000/
 ansible_ssh_private_key_file: ~/.ssh/demo-auth.pem
 
+remote_working_directory: /home/ubuntu
+
+cluster_name: "couchdb"
+couchdb_docker_swarm_file: "docker-swarm.yaml"
+couchdb_stack: "demo"
+couchdb_user: "admin"
+couchdb_password: "group27"
+
+
+couchdb_image: couchdb:3.0.0
+couchdb_VERSION: '3.0.0'
+couchdb_cookie: '46d689495ca02e8c35c3a3f683000ef1'
+couchdb_uuid: '7ff6dd245116a7288b798b003f00099e'
+couchdb_container_name: 'couchdb_'
+couchdb_port: 5984
+couchdb_db_name: "demo"

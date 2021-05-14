@@ -1,34 +1,61 @@
 ---
-- name: Install docker dependencies
-  become: yes
-  apt:
-    name: ['apt-transport-https', 'ca-certificates', 'curl', 'gnupg', 'lsb-release']
-    state: latest
-    install_recommends: no
-    update_cache: yes
+# - name: Install docker dependencies
+#   become: yes
+#   apt:
+#     name: ['apt-transport-https', 'ca-certificates', 'curl', 'gnupg', 'lsb-release']
+#     state: latest
+#     install_recommends: no
+#     update_cache: yes
 
-- name: Add Docker apt repository key
-  become: yes
-  apt_key:
-    url: https://download.docker.com/linux/ubuntu/gpg
-    state: present
+# - name: Add Docker apt repository key
+#   become: yes
+#   apt_key:
+#     url: https://download.docker.com/linux/ubuntu/gpg
+#     state: present
 
-- name: add docker repo
-  become: yes
-  apt_repository:
-    repo: "deb https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
-    state: present
+# - name: add docker repo
+#   become: yes
+#   apt_repository:
+#     repo: "deb https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+#     state: present
 
-- name: Install docker
-  become: yes
-  apt:
-    name: ['docker-ce']
-    state: latest
-    install_recommends: no
-    update_cache: yes
+# - name: Install docker
+#   become: yes
+#   apt:
+#     name: ['docker-ce']
+#     state: latest
+#     install_recommends: no
+#     update_cache: yes
 
-- name: Install docker-compose
+# - name: Install docker-compose
+#   become: yes
+#   pip:
+#     name: ['docker-compose']
+#     state: present
+
+- name: Create docker proxy directory
   become: yes
-  pip:
-    name: ['docker-compose']
-    state: present
+  file:
+    path: /etc/systemd/system/docker.service.d/
+    state: directory
+    recurse: yes
+
+- name: Create docker proxy config file
+  become: yes
+  copy:
+    content: ""
+    force: no
+    dest: /etc/systemd/system/docker.service.d/proxy.conf
+    mode: 0644
+
+- name: Add docker proxy
+  become: yes
+  blockinfile:
+    path: /etc/systemd/system/docker.service.d/proxy.conf
+    block: |
+      [Service]
+      Environment="HTTP_PROXY=http://wwwproxy.unimelb.edu.au:8000/"
+      Environment="HTTPS_PROXY=http://wwwproxy.unimelb.edu.au:8000/"
+      Environment="http_proxy=http://wwwproxy.unimelb.edu.au:8000/"
+      Environment="https_proxy=http://wwwproxy.unimelb.edu.au:8000/"
+      Environment="no_proxy=localhost,127.0.0.1,localaddress,172.16.0.0/12,.melbourne.rc.nectar.org.au,.storage.unimelb.edu.au,.cloud.unimelb.edu.au"

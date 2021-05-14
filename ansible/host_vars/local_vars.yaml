@@ -36,6 +36,14 @@ security_groups:
     port_range_min: 80
     port_range_max: 80
     remote_ip_prefix: 0.0.0.0/0
+  # - name: security_group
+  #   description: "security group for all instance server"
+  #   rules:
+  #     - name: 'Any'
+  #       protocol: tcp
+  #       port_range_min: 1
+  #       port_range_max: 65535
+  #       remote_ip_prefix: 0.0.0.0/0
 
 # Instance
 instances:

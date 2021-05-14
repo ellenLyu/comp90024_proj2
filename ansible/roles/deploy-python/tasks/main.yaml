@@ -1,0 +1,39 @@
+---
+- name: Create directory
+  file:
+    # path: '{{remote_working_directory}}/python'
+    path: $HOME/python
+    state: directory
+    recurse: yes
+
+- name: Upload files to instances
+  become: yes
+  # copy:
+  #   src: requirements.txt
+  #   dest: $HOME/python
+  #   mode: 0644
+  # copy:
+  #   src: DOCKERFILE
+  #   dest: $HOME/python
+  #   mode: 0644
+  # copy:
+  #   src: docker-compose.yaml
+  #   dest: $HOME/python
+  #   mode: 0644
+  copy:
+    src: files/
+    dest: '{{remote_working_directory}}/python/'
+    mode: 0644
+
+- name: Stop docker compose python
+  become: yes
+  # command: docker-compose down --rmi local
+  command: docker stack remove python
+  args:
+    chdir: '{{remote_working_directory}}/python'
+
+- name: Start docker service
+  become: yes
+  command: docker stack deploy python
+  args:
+    chdir: '{{remote_working_directory}}/python'
