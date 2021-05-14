@@ -6,6 +6,8 @@ couchdb vs couchbase
 
 https://github.com/klaemo/docker-couchdb/blob/29ed69965ed616a9d0df9a6ffa081773d86c78bc/1.6.1/Dockerfile
 
+# nginx
+
 # Spring
 FROM openjdk:11
 EXPOSE 8080
