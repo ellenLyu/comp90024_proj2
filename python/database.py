@@ -153,7 +153,7 @@ class Connection():
             else:
                 tweet_id = tweet['id_str']
                 source_text = tweet['text']
-                created_at = tweets['created_at']
+                created_at = tweet['created_at']
                 retweet_count = tweet['retweet_count']
                 favorite_count = tweet['favorite_count']
                 if tweet['coordinates']['coordinates'] != '':
