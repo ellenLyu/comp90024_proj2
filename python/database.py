@@ -17,7 +17,7 @@ class Connection():
             self.couch_db_connector = self.couch.create(database_name)
             self.create_default_views()
 
-    def insert_tweets(self, tweets_list):
+    def insert_tweets(self, tweets_list, has_doc: bool = False):
         """
         Insert twitter file to database
         :param tweets_list: list of tweets in json format
@@ -34,7 +34,7 @@ class Connection():
         for tweet in tweets_list:
 
             # Parse the tweet into dict
-            doc = self.parse_tweet(tweet, analyzer)
+            doc = self.parse_tweet(tweet, analyzer, has_doc)
 
             if doc is not None:
                 tmp_batch_list.append(doc)
@@ -132,26 +132,49 @@ class Connection():
             print("Failed to parse csv row: ", str(e))
             return None
 
-    def parse_tweet(self, tweet, analyzer):
+    def parse_tweet(self, tweet, analyzer, has_doc: bool = False):
         """
         Parse the tweets into dict
         :param tweet: tweet data
         :return: dict with expected fields
         """
         try:
-            tweet_id = tweet['doc']['id_str']
+            doc = {}
+            if has_doc:
+                tweet_id = tweet['doc']['id_str']
+                source_text = tweet['doc']['text']
+                created_at = tweet['doc']['created_at']
+                retweet_count = tweet['doc']['retweet_count']
+                favorite_count = tweet['doc']['favorite_count']
+                if tweet['doc']['coordinates']['coordinates'] != '':
+                    doc['coordinates'] = tweet['doc']['coordinates']['coordinates']
+                if tweet['doc']['entities']['hashtags']:
+                    doc['hashtags'] = tweet['doc']['entities']['hashtags']
+            else:
+                tweet_id = tweet['id_str']
+                source_text = tweet['text']
+                created_at = tweets['created_at']
+                retweet_count = tweet['retweet_count']
+                favorite_count = tweet['favorite_count']
+                if tweet['coordinates']['coordinates'] != '':
+                    doc['coordinates'] = tweet['coordinates']['coordinates']
+                if tweet['entities']['hashtags']:
+                    doc['hashtags'] = tweet['entities']['hashtags']
+
 
             # Get the sentiment
-            text = self.tweet_preprocessing(tweet['doc']['text'])
+            text = self.tweet_preprocessing(source_text)
             compound = analyzer.polarity_scores(text)['compound']
             sentiment = 'negative' if compound <= -0.05 else 'positive' if compound >= 0.05 else 'neutral'
 
-            doc = {'_id': tweet_id, 'text': tweet['doc']['text'], 'sentiment': sentiment}
-            # print(doc)
 
-            # If the tweet has geo info
-            if tweet['doc']['coordinates']['coordinates'] != '':
-                doc['coordinates'] = tweet['doc']['coordinates']['coordinates']
+            if 'suburb' in tweet:
+                doc['suburb'] = tweet['suburb']
+            doc.update({
+                '_id': tweet_id, 'text': source_text, 'sentiment': sentiment,
+                'created_at': created_at, 'retweet_count': retweet_count, 'favorite_count': favorite_count,
+            })
+            # print(doc)
 
             if tweet_id not in self.couch_db_connector:
                 return doc
