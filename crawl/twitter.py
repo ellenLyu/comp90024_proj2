@@ -18,7 +18,7 @@ access_token_secret = '9HMXSW6FzC24nlA1sccTaF8Wwypdh2KHbpxz2GT6jSB94'
 
 
 keywords = [
-    "covid",  "virus", "corona", "outbreak", "covid-19", "quarantine", "morrison", "scott morrison",
+    "covid",  "virus", "corona", "outbreak", "covid-19", "quarantine", "morrison",
 ]
 DB_AUTH = {"ADDRESS": "localhost", "PORT": "5984", "COUCHDB_USER": "admin", "COUCHDB_PASSWORD": "group27"}
 BATCH_SIZE = 300
@@ -34,7 +34,7 @@ def get_api():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-count', type=int, default='300')
+    parser.add_argument('-count', type=int, default=300)
     parser.add_argument('-dbname', type=str, default='demo')
     args = parser.parse_args()
 
@@ -58,7 +58,7 @@ if __name__ == '__main__':
     tweets = []
     for suburb, coordinates in suburbs.items():
         lat, lon = coordinates
-        geocode = f'{lat},{lon},10km'
+        geocode = f'{lat},{lon},1.5km'
         try:
             for tweet in tweepy.Cursor(api.search, q=keyword, include_rts=False, geocode=geocode).items(tweet_count):
                 tweet._json['suburb'] = suburb
