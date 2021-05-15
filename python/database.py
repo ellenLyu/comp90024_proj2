@@ -126,11 +126,7 @@ class Connection():
                 # Get the doc in database
                 ori_doc = dict(self.couch_db_connector[sid])
 
-                # If they are different, require update
-                if ori_doc != doc:
-                    return ori_doc.update(doc)
-                else:
-                    return None
+                return self._compare_two_docs(doc=doc, ori_doc=ori_doc)
 
         except Exception as e:
             print("Failed to parse csv row: ", str(e))
@@ -159,16 +155,12 @@ class Connection():
 
             if tweet_id not in self.couch_db_connector:
                 return doc
-
             else:
                 # Get the doc in database
                 ori_doc = dict(self.couch_db_connector[tweet_id])
 
-                # If they are different, require update
-                if doc != ori_doc:
-                    return ori_doc.update(doc)
-                else:
-                    return None
+                return self._compare_two_docs(doc=doc, ori_doc=ori_doc)
+
 
         except Exception as e:
             print("Failed to parse tweet: ", str(e))
@@ -185,3 +177,23 @@ class Connection():
         text = re.sub(r'@[A-Za-z0-9]+', '', text)
 
         return text
+
+
+    def _compare_two_docs(self, doc: dict, ori_doc: dict):
+        """
+        Compare the existing doc and new doc
+        :param doc: new doc
+        :param ori_doc: existing doc
+        :return: update doc if different, otherwise None
+        """
+        # Extract the existing _rev
+        _rev = ori_doc.pop('_rev')
+
+        if ori_doc != doc:
+            # If they are different, require update
+            ori_doc.update(doc)
+            ori_doc['_rev'] = _rev
+            return ori_doc
+        else:
+            # Otherwise, do not perform update
+            return None
