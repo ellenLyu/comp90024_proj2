@@ -1,5 +1,6 @@
 import couchdb
 import re
+from couchdb import design
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
 
@@ -14,6 +15,7 @@ class Connection():
             self.couch_db_connector = self.couch[database_name]
         except:
             self.couch_db_connector = self.couch.create(database_name)
+            self.create_default_views()
 
     def insert_tweets(self, tweets_list):
         """
@@ -40,6 +42,7 @@ class Connection():
             # If reach the batch size, insert
             if len(tmp_batch_list) == self.BATCH_SIZE:
                 res = self.couch_db_connector.update(tmp_batch_list)
+                tmp_batch_list = []
                 print(res)
 
         # Insert the remaining
@@ -50,6 +53,7 @@ class Connection():
     def insert_dataset(self, file, keys: list):
         """
         Insert csv file to database
+        :param keys: List of fields to concat the id
         :param file: list of csv file content
         :return:
         """
@@ -63,21 +67,45 @@ class Connection():
                 print(fields)
                 continue
             else:
-                tmp_batch_list.append(self.parse_csv(fields, row, keys=keys))
+                doc = self.parse_csv(fields, row, keys=keys)
+
+                if doc is not None:
+                    tmp_batch_list.append(doc)
 
                 if len(tmp_batch_list) == self.BATCH_SIZE:
                     res = self.couch_db_connector.update(tmp_batch_list)
+                    tmp_batch_list = []
                     print(res)
 
         if len(tmp_batch_list) != 0:
             res = self.couch_db_connector.update(tmp_batch_list)
             print(res)
 
+    def create_default_views(self):
+        """
+        Create default views to get all docs with all fields.
+        :return:
+        """
+
+        # view 1: views to get all docs with all fields
+        view1_map = "function (doc) { emit(doc._id, doc) }"
+        view1 = design.ViewDefinition(design="example", name="get_all", map_fun=view1_map)
+
+        view1.sync(self.couch_db_connector)
+
+        # view 2: views to get count of all docs
+        view2_map = "function (doc) { emit(doc._id, 1) }"
+        view2_reduce = "function(keys, values) { return sum(values) }"
+        view2 = design.ViewDefinition(design="example", name="get_all_count",
+                                      map_fun=view2_map, reduce_fun=view2_reduce)
+
+        view2.sync(self.couch_db_connector)
+
     ###########################
     # Helper function
     ###########################
 
-    def parse_csv(self, fields:list, row, keys):
+    def parse_csv(self, fields: list, row, keys):
         """
         Parse the row in csv file into dict
         :param fields: cols list
@@ -85,21 +113,28 @@ class Connection():
         :return: dict with expected fields
         """
         try:
-            doc = None
+            doc = dict(zip(fields, row))
 
             # Join the key for row
             sid = '_'.join([row[fields.index(key)] for key in keys])
+            doc['_id'] = sid
 
             # If the row does not exist in database, create the doc
             if sid not in self.couch_db_connector:
-                doc = dict(zip(fields, row))
-                doc['_id'] = sid
+                return doc
+            else:
+                # Get the doc in database
+                ori_doc = dict(self.couch_db_connector[sid])
+
+                # If they are different, require update
+                if ori_doc != doc:
+                    return ori_doc.update(doc)
+                else:
+                    return None
 
         except Exception as e:
             print("Failed to parse csv row: ", str(e))
             return None
-
-        return doc
 
     def parse_tweet(self, tweet, analyzer):
         """
@@ -108,28 +143,32 @@ class Connection():
         :return: dict with expected fields
         """
         try:
-            doc = None
             tweet_id = tweet['doc']['id_str']
 
+            # Get the sentiment
+            text = self.tweet_preprocessing(tweet['doc']['text'])
+            compound = analyzer.polarity_scores(text)['compound']
+            sentiment = 'negative' if compound <= -0.05 else 'positive' if compound >= 0.05 else 'neutral'
+
+            doc = {'_id': tweet_id, 'text': tweet['doc']['text'], 'sentiment': sentiment}
+            # print(doc)
+
+            # If the tweet has geo info
+            if tweet['doc']['coordinates']['coordinates'] != '':
+                doc['coordinates'] = tweet['doc']['coordinates']['coordinates']
+
             if tweet_id not in self.couch_db_connector:
+                return doc
 
-                # Get the sentiment
-                text = self.tweet_preprocessing(tweet['doc']['text'])
-                compound = analyzer.polarity_scores(text)['compound']
-                sentiment = 'negative' if compound <= -0.05 else 'positive' if compound >= 0.05 else 'neutral'
+            else:
+                # Get the doc in database
+                ori_doc = dict(self.couch_db_connector[tweet_id])
 
-                doc = {'_id': tweet_id, 'text': tweet['doc']['text'], 'sentiment': sentiment}
-                print(doc)
-                # if "_rev" in tweet['doc']:
-                # print(tweet['doc'].pop("_rev"))
-                # if tweet['doc']['_rev'] != '':
-                #     doc['_rev'] = tweet['doc']['_rev']
-
-                # If the tweet has geo info
-                if tweet['doc']['coordinates']['coordinates'] != '':
-                    doc['coordinates'] = tweet['doc']['coordinates']['coordinates']
-
-            return doc
+                # If they are different, require update
+                if doc != ori_doc:
+                    return ori_doc.update(doc)
+                else:
+                    return None
 
         except Exception as e:
             print("Failed to parse tweet: ", str(e))
