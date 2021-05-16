@@ -1,0 +1,16 @@
+{
+  "_id": "_design/covid_example",
+  "views": {
+    "get_all": {
+      "map": "function (doc) { emit(doc._id, doc) }"
+    },
+    "get_all_count": {
+      "map": "function (doc) { emit(doc._id, 1) }",
+      "reduce": "function(keys, values) { return sum(values) }"
+    },
+    "by_date": {
+      "map": "function(doc, req) { if (doc.data_date) { emit(doc.data_date, doc)} }"
+    }
+  },
+  "language": "javascript"
+}

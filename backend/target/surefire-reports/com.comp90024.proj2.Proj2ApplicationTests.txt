@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.comp90024.proj2.Proj2ApplicationTests
--------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.461 s - in com.comp90024.proj2.Proj2ApplicationTests

@@ -2,48 +2,39 @@ package com.comp90024.proj2.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.List;
+
 public class Tweet {
 
-    @JsonProperty(value="_id")
-    private String id;
+    @JsonProperty("_id")
+    private String _id;
 
-    @JsonProperty(value="_rev")
-    private String revision;
+    @JsonProperty("_rev")
+    private String _revision;
 
-    private String type;
+    @JsonProperty("text")
     private String text;
-    private String user;
 
-    public Tweet(String id, String revision, String type, String text, String user) {
-        this.id = id;
-        this.revision = revision;
-        this.type = type;
-        this.text = text;
-        this.user = user;
+    @JsonProperty("sentiment")
+    private String sentiment;
+
+    @JsonProperty("coordinates")
+    private List<Double> coordinates;
+
+    public String get_id() {
+        return _id;
     }
 
-    public String getId() {
-        return id;
+    public void set_id(String _id) {
+        this._id = _id;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public String get_revision() {
+        return _revision;
     }
 
-    public String getRevision() {
-        return revision;
-    }
-
-    public void setRevision(String revision) {
-        this.revision = revision;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
+    public void set_revision(String _revision) {
+        this._revision = _revision;
     }
 
     public String getText() {
@@ -54,14 +45,19 @@ public class Tweet {
         this.text = text;
     }
 
-    public String getUser() {
-        return user;
+    public String getSentiment() {
+        return sentiment;
     }
 
-    public void setUser(String user) {
-        this.user = user;
+    public void setSentiment(String sentiment) {
+        this.sentiment = sentiment;
     }
 
-    // standard getters and setters
+    public List<Double> getCoordinates() {
+        return coordinates;
+    }
 
+    public void setCoordinates(List<Double> coordinates) {
+        this.coordinates = coordinates;
+    }
 }

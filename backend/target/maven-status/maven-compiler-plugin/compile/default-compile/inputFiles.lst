@@ -1,8 +1,12 @@
+/Users/chenyinglyu/Documents/COMP90024 CCC/proj2_git/backend/src/main/java/com/comp90024/proj2/entity/Covid.java
 /Users/chenyinglyu/Documents/COMP90024 CCC/proj2_git/backend/src/main/java/com/comp90024/proj2/entity/Tweet.java
+/Users/chenyinglyu/Documents/COMP90024 CCC/proj2_git/backend/src/main/java/com/comp90024/proj2/util/StringUtils.java
 /Users/chenyinglyu/Documents/COMP90024 CCC/proj2_git/backend/src/main/java/com/comp90024/proj2/Proj2Application.java
 /Users/chenyinglyu/Documents/COMP90024 CCC/proj2_git/backend/src/main/java/com/comp90024/proj2/service/SearchService.java
+/Users/chenyinglyu/Documents/COMP90024 CCC/proj2_git/backend/src/main/java/com/comp90024/proj2/view/CovidDaoImpl.java
 /Users/chenyinglyu/Documents/COMP90024 CCC/proj2_git/backend/src/main/java/com/comp90024/proj2/controller/SearchController.java
-/Users/chenyinglyu/Documents/COMP90024 CCC/proj2_git/backend/src/main/java/com/comp90024/proj2/service/SearchServiceImpl.java
 /Users/chenyinglyu/Documents/COMP90024 CCC/proj2_git/backend/src/main/java/com/comp90024/proj2/config/CouchDBConfig.java
 /Users/chenyinglyu/Documents/COMP90024 CCC/proj2_git/backend/src/main/java/com/comp90024/proj2/util/Consts.java
+/Users/chenyinglyu/Documents/COMP90024 CCC/proj2_git/backend/src/main/java/com/comp90024/proj2/service/impl/SearchServiceImpl.java
+/Users/chenyinglyu/Documents/COMP90024 CCC/proj2_git/backend/src/main/java/com/comp90024/proj2/view/TweetDaoImpl.java
 /Users/chenyinglyu/Documents/COMP90024 CCC/proj2_git/backend/src/main/java/com/comp90024/proj2/util/CommonResult.java
