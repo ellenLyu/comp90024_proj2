@@ -4,8 +4,8 @@ from couchdb import design
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
 
-class Connection():
-    BATCH_SIZE = 100
+class Connection:
+    BATCH_SIZE = 150
 
     def __init__(self, database_name, url):
         print(url)
@@ -153,11 +153,11 @@ class Connection():
             else:
                 tweet_id = tweet['id_str']
                 source_text = tweet['text']
-                created_at = tweets['created_at']
+                created_at = tweet['created_at']
                 retweet_count = tweet['retweet_count']
                 favorite_count = tweet['favorite_count']
-                if tweet['coordinates']['coordinates'] != '':
-                    doc['coordinates'] = tweet['coordinates']['coordinates']
+                if tweet['coordinates']:
+                    doc['coordinates'] = tweet['coordinates']
                 if tweet['entities']['hashtags']:
                     doc['hashtags'] = tweet['entities']['hashtags']
 
@@ -183,7 +183,6 @@ class Connection():
                 ori_doc = dict(self.couch_db_connector[tweet_id])
 
                 return self._compare_two_docs(doc=doc, ori_doc=ori_doc)
-
 
         except Exception as e:
             print("Failed to parse tweet: ", str(e))
