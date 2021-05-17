@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootApplication
 @RestController
+@EnableScheduling
 public class Proj2Application {
 
     @RequestMapping("/")
@@ -18,4 +19,11 @@ public class Proj2Application {
         SpringApplication.run(Proj2Application.class, args);
     }
 
+    @Bean
+    public TaskScheduler taskScheduler() {
+        System.out.println("TaskScheduler");
+        ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
+        taskScheduler.setPoolSize(10);
+        return taskScheduler;
+    }
 }
