@@ -15,16 +15,18 @@ from tweepy.streaming import StreamListener
 # consumer_key = 'T08RKyC74lJTtOeozaBMSjbs9'  
 # consumer_secret = 'nBbdYRK7BmsoD5h23l9OT4ICQ2CABnmcCJAJunZtFtv556bYzL'  
 # access_token = '1388437713536229380-rUyKUTYcwz887Hw0AdsLbhZtfapxeJ'  
-# access_token_secret = 'bmZSM7APPq9MFbNZqiBsMkE9nk3rpZVU07qDzNfePg6T2'  
+# access_token_secret = 'bmZSM7APPq9MFbNZqiBsMkE9nk3rpZVU07qDzNfePg6T2'
+# env_label = "dev"
 
 
-consumer_key = 'xEq8Jp0JQ2dGV83zckKcmM7OD'  
-consumer_secret = 'WTxu63zuHlq7tkHr7EQgyZEBQ7bSlr42SmTcfBUoEbvvG498Lx'  
-access_token = '1387770902490849283-Xl1JItql6wHiYLt4VUY86ztzOtJSTn'  
-access_token_secret = 'v06774P9GqModBseAlKIWVmK9a6asKSbkc8fk7mEFhW1g'
+consumer_key = 'tOZAOMxCWzvKXZDDTOsYweYr1'  
+consumer_secret = '8xOqAwE8JvH0LtfjVL7dSh1uh3KIAVIvU7KgsijF55LDofTyAA'  
+access_token = '1388443056366522373-10dWmvKxRHWUCNxvkkIpbU6ee0Wb9c'  
+access_token_secret = '0hvk2gG9KdkblJkmU88Y2SmOcECU3SXQHaC9A6ginJrL3'
+env_label = "test"
 
 keywords = [
-    "covid",  "virus", "corona", "outbreak", "covid-19", "quarantine"
+    "covid",  
 ]
 keyword = f'({" OR ".join(keywords)})'
 DB_AUTH = {"ADDRESS": "172.26.130.120", "PORT": "5984", "COUCHDB_USER": "admin", "COUCHDB_PASSWORD": "group27"}
@@ -40,7 +42,7 @@ class Crawler:
         self.tweets = []
 
     def crawl(self, query, suburb):
-        for tweet in tweepy.Cursor(self.api.search_30_day, query=query, environment_name='90024').items(self.tweet_count):
+        for tweet in tweepy.Cursor(self.api.search_30_day, query=query, environment_name=env_label).items(self.tweet_count):
             temp = tweet._json
             if temp is not None:
                 temp['suburb'] = suburb
@@ -52,8 +54,8 @@ class Crawler:
     def run(self):
         for suburb, coordinates in self.suburbs.items():
             lat, lon = coordinates
-            geocode = f'[{lon} {lat} 4km]'
-            print(geocode)
+            geocode = f'[{lon} {lat} 2km]'
+            print(suburb, geocode)
             query = f'{keyword} point_radius:{geocode}'
             try:
                 self.crawl(query, suburb)
@@ -84,7 +86,7 @@ def get_api():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-count', type=int, default=300)
+    parser.add_argument('-count', type=int, default=1000)
     parser.add_argument('-dbname', type=str, default='demo')
     args = parser.parse_args()
 
