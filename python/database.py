@@ -17,7 +17,7 @@ class Connection():
             self.couch_db_connector = self.couch.create(database_name)
             self.create_default_views()
 
-    def insert_tweets(self, tweets_list, has_doc: bool = False):
+    def insert_tweets(self, tweets_list):
         """
         Insert twitter file to database
         :param tweets_list: list of tweets in json format
@@ -34,7 +34,7 @@ class Connection():
         for tweet in tweets_list:
 
             # Parse the tweet into dict
-            doc = self.parse_tweet(tweet, analyzer, has_doc)
+            doc = self.parse_tweet(tweet, analyzer)
 
             if doc is not None:
                 tmp_batch_list.append(doc)
@@ -61,13 +61,17 @@ class Connection():
         fields = None
         tmp_batch_list = []
 
+        row_idx = 0
         for row in file:
             if fields is None:
                 fields = row
                 print(fields)
                 continue
             else:
-                doc = self.parse_csv(fields, row, keys=keys)
+                if 'row-index' in keys:
+                    doc = self.parse_csv(fields, row, keys=row_idx)
+                else:
+                    doc = self.parse_csv(fields, row, keys=keys)
 
                 if doc is not None:
                     tmp_batch_list.append(doc)
@@ -76,6 +80,8 @@ class Connection():
                     res = self.couch_db_connector.update(tmp_batch_list)
                     tmp_batch_list = []
                     print(res)
+
+            row_idx += 1
 
         if len(tmp_batch_list) != 0:
             res = self.couch_db_connector.update(tmp_batch_list)
@@ -108,6 +114,7 @@ class Connection():
     def parse_csv(self, fields: list, row, keys):
         """
         Parse the row in csv file into dict
+        :param keys:
         :param fields: cols list
         :param row: row data
         :return: dict with expected fields
@@ -116,7 +123,10 @@ class Connection():
             doc = dict(zip(fields, row))
 
             # Join the key for row
-            sid = '_'.join([row[fields.index(key)] for key in keys])
+            if type(keys) == int:
+                sid = 'idx_' + str(keys)
+            else:
+                sid = '_'.join([row[fields.index(key)] for key in keys])
             doc['_id'] = sid
 
             # If the row does not exist in database, create the doc
@@ -132,49 +142,26 @@ class Connection():
             print("Failed to parse csv row: ", str(e))
             return None
 
-    def parse_tweet(self, tweet, analyzer, has_doc: bool = False):
+    def parse_tweet(self, tweet, analyzer):
         """
         Parse the tweets into dict
         :param tweet: tweet data
         :return: dict with expected fields
         """
         try:
-            doc = {}
-            if has_doc:
-                tweet_id = tweet['doc']['id_str']
-                source_text = tweet['doc']['text']
-                created_at = tweet['doc']['created_at']
-                retweet_count = tweet['doc']['retweet_count']
-                favorite_count = tweet['doc']['favorite_count']
-                if tweet['doc']['coordinates']['coordinates'] != '':
-                    doc['coordinates'] = tweet['doc']['coordinates']['coordinates']
-                if tweet['doc']['entities']['hashtags']:
-                    doc['hashtags'] = tweet['doc']['entities']['hashtags']
-            else:
-                tweet_id = tweet['id_str']
-                source_text = tweet['text']
-                created_at = tweet['created_at']
-                retweet_count = tweet['retweet_count']
-                favorite_count = tweet['favorite_count']
-                if tweet['coordinates']['coordinates'] != '':
-                    doc['coordinates'] = tweet['coordinates']['coordinates']
-                if tweet['entities']['hashtags']:
-                    doc['hashtags'] = tweet['entities']['hashtags']
-
+            tweet_id = tweet['doc']['id_str']
 
             # Get the sentiment
-            text = self.tweet_preprocessing(source_text)
+            text = self.tweet_preprocessing(tweet['doc']['text'])
             compound = analyzer.polarity_scores(text)['compound']
             sentiment = 'negative' if compound <= -0.05 else 'positive' if compound >= 0.05 else 'neutral'
 
-
-            if 'suburb' in tweet:
-                doc['suburb'] = tweet['suburb']
-            doc.update({
-                '_id': tweet_id, 'text': source_text, 'sentiment': sentiment,
-                'created_at': created_at, 'retweet_count': retweet_count, 'favorite_count': favorite_count,
-            })
+            doc = {'_id': tweet_id, 'text': tweet['doc']['text'], 'sentiment': sentiment}
             # print(doc)
+
+            # If the tweet has geo info
+            if tweet['doc']['coordinates']['coordinates'] != '':
+                doc['coordinates'] = tweet['doc']['coordinates']['coordinates']
 
             if tweet_id not in self.couch_db_connector:
                 return doc
@@ -220,3 +207,15 @@ class Connection():
         else:
             # Otherwise, do not perform update
             return None
+
+
+if __name__ == '__main__':
+    dict1 ={'_id': '556746482679021568', '_rev': '1-8c45f848e2e412394f6b0e2c5aa48188', 'text': 'Mwah 😘… http://t.co/r3nxjrDIs2', 'sentiment': 'positive', 'coordinates': [144.9751516, -37.87538158]}
+    dict2 ={'_id': '556746482679021568', 'text': 'Mwah 😘… http://t.co/r3nxjrDIs2', 'sentiment': 'positive', 'coordinates': [144.9751516, -37.87538158]}
+    print(dict1 == dict2)
+
+    print(dict1.pop('_rev'))
+    print(dict1 == dict2)
+
+    dict1.update(dict2)
+    print(dict1)
