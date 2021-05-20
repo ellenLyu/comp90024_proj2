@@ -1,9 +1,12 @@
 package com.comp90024.proj2.view;
 
 import com.comp90024.proj2.entity.Covid;
+import com.comp90024.proj2.service.impl.PythonServiceImpl;
 import org.ektorp.CouchDbConnector;
 import org.ektorp.support.CouchDbRepositorySupport;
 import org.ektorp.support.View;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.DependsOn;
@@ -17,6 +20,9 @@ public class CovidDaoImpl extends CouchDbRepositorySupport<Covid> {
 
     private CouchDbConnector covidDbConnector;
 
+    private static final Logger logger = LoggerFactory.getLogger(CovidDaoImpl.class);
+
+
     @Autowired
     public CovidDaoImpl(@Qualifier("covidDbConnector") CouchDbConnector couchdb) {
         super(Covid.class, couchdb);
@@ -24,7 +30,7 @@ public class CovidDaoImpl extends CouchDbRepositorySupport<Covid> {
         try {
             initStandardDesignDocument();
         } catch (NullPointerException e) {
-            System.out.println("exists");
+            logger.debug("View CovidDaoImpl is existing.");
         }
     }
 

@@ -13,10 +13,10 @@ import java.util.TimeZone;
 
 @SpringBootTest
 class Proj2ApplicationTests {
-
-    @Autowired
-    PythonServiceImpl pythonService;
-
+//
+//    @Autowired
+//    PythonServiceImpl pythonService;
+//
 //	@Autowired
 //	SearchServiceImpl searchService;
 //
@@ -24,13 +24,14 @@ class Proj2ApplicationTests {
 //	void contextLoads() {
 //	}
 //
-	@Test
-	public void testQuery() throws IOException, InterruptedException {
+//	@Test
+//	public void testQuery() throws IOException, InterruptedException {
 
-        pythonService.crawlCovid();
+//	    searchService.largeTweetBySuburbs("", "2016");
+//        pythonService.crawlCovid();
 //		searchService.groupByDate("03/05/2021");
 //		searchService.getAll();
 //		searchService.tweetBySentiment();
-	}
+//	}
 
 }

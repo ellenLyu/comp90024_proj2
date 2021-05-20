@@ -1,6 +1,7 @@
 package com.comp90024.proj2.service.impl;
 
 import com.comp90024.proj2.service.PythonService;
+import com.comp90024.proj2.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,8 +22,24 @@ public class PythonServiceImpl implements PythonService {
 
     @Override
     public void crawlCovid() throws IOException, InterruptedException {
-        String pyFile = PY_PATH + "crawl_covid_cases.py";
-        exec(pyFile);
+        String crawl = PY_PATH + "crawl_covid_cases.py";
+        String insert2couch = PY_PATH + "connect_db.py";
+
+        String filename = exec(crawl);
+
+        if (StringUtils.isNotEmpty(filename) && filename.contains("files/")) {
+            filename = filename.replaceAll("files/", "");
+            filename = filename.replaceAll("\n", "");
+
+            System.out.println("filename: " + filename);
+            String success = exec(insert2couch, "-mode", "csv", "-filename", filename,
+                    "-dbname", "covidcases", "-keys", "postcode", "data_date");
+
+            logger.info("Covid Cases " + filename + " has been updated to Couch DB");
+        } else {
+            logger.debug("Covid Cases crawl failed");
+        }
+
     }
 
     /**
@@ -73,13 +90,14 @@ public class PythonServiceImpl implements PythonService {
         if (args != null && args.length > 0) {
             command.addAll(Arrays.asList(args));
         }
+
         logger.info("Python Command: {}", command);
         ProcessBuilder builder = new ProcessBuilder(command);
         builder.directory(directory);
         return builder;
     }
 
-    private class ProcessStreamReadTask {
+    private static class ProcessStreamReadTask {
 
         private volatile String message = "";
 
@@ -130,6 +148,7 @@ public class PythonServiceImpl implements PythonService {
             try {
                 String line = null;
                 while ((line = reader.readLine()) != null) {
+                    System.out.println(line);
                     sb.append(line).append("\n");
                 }
             } catch (IOException e) {

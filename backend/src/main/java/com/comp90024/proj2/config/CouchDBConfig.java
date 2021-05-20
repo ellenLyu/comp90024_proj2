@@ -48,4 +48,26 @@ public class CouchDBConfig {
 
         return couchDbConnector;
     }
+
+    @Bean
+    @Autowired
+    public CouchDbConnector demoDbConnector(CouchDbInstance couchDbInstance,
+                                             @Value("${couchdb.database.demo}") String database) throws Exception {
+
+        CouchDbConnector couchDbConnector = new StdCouchDbConnector(database, couchDbInstance);
+        couchDbConnector.createDatabaseIfNotExists();
+
+        return couchDbConnector;
+    }
+
+    @Bean
+    @Autowired
+    public CouchDbConnector largeDbConnector(CouchDbInstance couchDbInstance,
+                                            @Value("${couchdb.database.large}") String database) throws Exception {
+
+        CouchDbConnector couchDbConnector = new StdCouchDbConnector(database, couchDbInstance);
+        couchDbConnector.createDatabaseIfNotExists();
+
+        return couchDbConnector;
+    }
 }

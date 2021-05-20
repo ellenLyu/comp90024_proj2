@@ -4,17 +4,20 @@ import com.comp90024.proj2.entity.Covid;
 import com.comp90024.proj2.service.SearchService;
 import com.comp90024.proj2.util.StringUtils;
 import com.comp90024.proj2.view.CovidDaoImpl;
+import com.comp90024.proj2.view.DemoDaoImpl;
+import com.comp90024.proj2.view.LargeDaoImpl;
 import com.comp90024.proj2.view.TweetDaoImpl;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.ektorp.CouchDbConnector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @Service
 public class SearchServiceImpl implements SearchService {
@@ -32,6 +35,12 @@ public class SearchServiceImpl implements SearchService {
 
     @Autowired
     private TweetDaoImpl tweetDaoImpl;
+
+    @Autowired
+    private DemoDaoImpl demoDaoImpl;
+
+    @Autowired
+    private LargeDaoImpl largeDaoImpl;
 
 
     @Override
@@ -74,17 +83,60 @@ public class SearchServiceImpl implements SearchService {
     @Override
     public List<Map<String, Object>> tweetBySentiment() {
         List<Map<String, Object>> result = new ArrayList<>();
-        Map<String, Integer> queryRes = tweetDaoImpl.findBySentiment();
-
-        for (String key : queryRes.keySet()) {
-            if (!"total".equals(key)) {
-                Map<String, Object> data = new HashMap<>();
-                data.put("name", key);
-                data.put("y", ((float) queryRes.get(key)) / queryRes.get("total"));
-                result.add(data);
-            }
-        }
+//        Map<String, Integer> queryRes = tweetDaoImpl.findBySentiment();
+//
+//        for (String key : queryRes.keySet()) {
+//            if (!"total".equals(key)) {
+//                Map<String, Object> data = new HashMap<>();
+//                data.put("name", key);
+//                data.put("y", ((float) queryRes.get(key)) / queryRes.get("total"));
+//                result.add(data);
+//            }
+//        }
 
         return result;
+    }
+
+    @Override
+    public Map<String, Integer> tweetBySuburbs() {
+//        List<Map<String, Object>> result = new ArrayList<>();
+        Map<String, Integer> queryRes = demoDaoImpl.getSuburbs();
+
+        return queryRes;
+    }
+
+
+    @Override
+    public Map<?, Integer> largeTweetBySuburbs(String suburb, String date) {
+
+        Map<JsonNode, Integer> queryRes = largeDaoImpl.getSuburbsByYears();
+
+        // If specified suburb and date
+        if (StringUtils.isNotEmpty(suburb) && StringUtils.isNotEmpty(date)) {
+            return queryRes.entrySet().stream().filter(
+                    entry -> suburb.equals(entry.getKey().get(0).asText(""))
+                            && date.equals(entry.getKey().get(1).asText(""))
+            ).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        }
+
+        // If specified suburb
+        if (StringUtils.isNotEmpty(suburb)) {
+
+            return queryRes.entrySet().stream().filter(
+                    entry -> suburb.equals(entry.getKey().get(0).asText(""))
+            ).collect(Collectors.toMap(entry -> entry.getKey().get(1).asText().replaceAll("\"", ""),
+                    Map.Entry::getValue));
+        }
+
+        // If specified date
+        if (StringUtils.isNotEmpty(date)) {
+
+            return queryRes.entrySet().stream().filter(
+                    entry -> date.equals(entry.getKey().get(1).asText(""))
+            ).collect(Collectors.toMap(entry -> entry.getKey().get(0).asText().replaceAll("\"", ""),
+                    Map.Entry::getValue));
+        }
+
+        return queryRes;
     }
 }

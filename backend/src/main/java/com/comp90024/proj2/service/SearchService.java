@@ -12,4 +12,8 @@ public interface SearchService {
 
     List<Map<String, Object>> tweetBySentiment() throws IOException;
 
+    Map<String, Integer> tweetBySuburbs() throws IOException;
+
+    Map<? extends Object, Integer> largeTweetBySuburbs(String suburb, String date) throws IOException;
+
 }
