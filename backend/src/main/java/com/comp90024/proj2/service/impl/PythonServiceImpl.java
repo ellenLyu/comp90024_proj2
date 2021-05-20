@@ -21,7 +21,7 @@ public class PythonServiceImpl implements PythonService {
     private String PY_PATH;
 
     @Override
-    public void crawlCovid() throws IOException, InterruptedException {
+    public void crawlTweetGeo() throws IOException, InterruptedException {
         String crawl = PY_PATH + "crawl_covid_cases.py";
         String insert2couch = PY_PATH + "connect_db.py";
 
@@ -39,7 +39,29 @@ public class PythonServiceImpl implements PythonService {
         } else {
             logger.debug("Covid Cases crawl failed");
         }
+    }
 
+
+    @Override
+    public void crawlCovid() throws IOException, InterruptedException {
+        String crawl = PY_PATH + "tweepy_geo.py";
+        String insert2couch = PY_PATH + "connect_db.py";
+
+        String filename = exec(crawl);
+
+        if (StringUtils.isNotEmpty(filename) && filename.contains("Success: ")) {
+            filename = filename.replaceAll("Success: ", "");
+            filename = filename.replaceAll("files/", "");
+            filename = filename.replaceAll("\n", "");
+
+            System.out.println("filename: " + filename);
+            String success = exec(insert2couch, "-mode", "twitter", "-filename", filename,
+                    "-dbname", "large");
+
+            logger.info("Tweepy Geo " + filename + " has been updated to Couch DB");
+        } else {
+            logger.debug("Tweepy Geo failed");
+        }
     }
 
     /**

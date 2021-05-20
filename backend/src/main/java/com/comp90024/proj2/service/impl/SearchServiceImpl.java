@@ -53,7 +53,7 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public List<Map<String, Object>> tweetBySentiment() {
+    public List<Map<String, Object>> tweetBySentiment(String suburb, String date) {
         List<Map<String, Object>> result = new ArrayList<>();
 //        Map<String, Integer> queryRes = tweetDaoImpl.findBySentiment();
 //

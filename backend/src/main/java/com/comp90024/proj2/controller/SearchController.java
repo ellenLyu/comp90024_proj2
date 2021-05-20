@@ -28,7 +28,8 @@ public class SearchController {
     @RequestMapping(value = "/tweet_sent_pie", method = RequestMethod.POST)
     public CommonResult getTweetSentiment(@RequestBody JSONObject requestBody) {
 
-        List<Map<String, Object>> result = searchService.tweetBySentiment();
+        List<Map<String, Object>> result = searchService.tweetBySentiment(
+                requestBody.getString("suburb"), requestBody.getString("year"));
         return CommonResult.success(result, "success");
     }
 

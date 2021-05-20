@@ -5,4 +5,6 @@ import java.io.IOException;
 public interface PythonService {
 
   void crawlCovid() throws IOException, InterruptedException;
+
+  void crawlTweetGeo() throws IOException, InterruptedException;
 }

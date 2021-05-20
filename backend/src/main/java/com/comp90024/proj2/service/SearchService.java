@@ -8,7 +8,7 @@ public interface SearchService {
 
     List<List<Float>> groupByDate(String date) throws IOException;
 
-    List<Map<String, Object>> tweetBySentiment() throws IOException;
+    List<Map<String, Object>> tweetBySentiment(String suburb, String date) throws IOException;
 
     Map<String, Integer> tweetBySuburbs() throws IOException;
 

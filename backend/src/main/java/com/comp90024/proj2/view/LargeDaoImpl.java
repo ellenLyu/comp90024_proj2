@@ -51,8 +51,24 @@ public class LargeDaoImpl extends CouchDbRepositorySupport<DemoTweet> {
         }
 
         return res;
-
     }
+
+
+    @View(name="sentiment_by_suburb_year")
+    public Map<JsonNode, Integer> getSentiments() {
+        Map<JsonNode, Integer> res = new HashMap<>();
+
+        ViewQuery query = new ViewQuery().designDocId("_design/example").viewName("suburbs_year").group(true);
+        ViewResult result = db.queryView(query);
+
+        List<ViewResult.Row> bySuburbs = result.getRows();
+        for (ViewResult.Row row : bySuburbs) {
+            res.put(row.getKeyAsNode(), Integer.parseInt(row.getValue()));
+        }
+
+        return res;
+    }
+
 
 
 

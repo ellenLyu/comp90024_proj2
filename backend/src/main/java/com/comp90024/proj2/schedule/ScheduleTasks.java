@@ -26,7 +26,7 @@ public class ScheduleTasks {
   @Scheduled(cron = "0 45 13 * * ?", zone = "GMT+8:00")
   private void crawlCovidCases() {
 
-    logger.info("Scheduled task crawlCovidCases is called");
+    logger.info("Scheduled task Crawl CovidCases is called");
     try {
       pythonService.crawlCovid();
     } catch (IOException | InterruptedException | NullPointerException e) {
@@ -34,4 +34,14 @@ public class ScheduleTasks {
     }
   }
 
+  @Scheduled(cron = "0 45 10 * * ?", zone = "GMT+8:00")
+  private void crawlTweetSuburb() {
+
+    logger.info("Scheduled task Crawl TweetSuburb is called");
+    try {
+      pythonService.crawlCovid();
+    } catch (IOException | InterruptedException | NullPointerException e) {
+      e.printStackTrace();
+    }
+  }
 }
