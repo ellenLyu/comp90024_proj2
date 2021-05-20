@@ -33,7 +33,7 @@ public class PythonServiceImpl implements PythonService {
 
             System.out.println("filename: " + filename);
             String success = exec(insert2couch, "-mode", "csv", "-filename", filename,
-                    "-dbname", "covidcases", "-keys", "postcode", "data_date");
+                    "-dbname", "large");
 
             logger.info("Covid Cases " + filename + " has been updated to Couch DB");
         } else {

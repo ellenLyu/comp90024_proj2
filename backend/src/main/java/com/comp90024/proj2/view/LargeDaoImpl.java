@@ -60,12 +60,13 @@ public class LargeDaoImpl extends CouchDbRepositorySupport<DemoTweet> {
 
         ViewQuery query = new ViewQuery().designDocId("_design/example").viewName("suburbs_year").group(true);
         ViewResult result = db.queryView(query);
+        System.out.println(result);
 
-        List<ViewResult.Row> bySuburbs = result.getRows();
-        for (ViewResult.Row row : bySuburbs) {
-            res.put(row.getKeyAsNode(), Integer.parseInt(row.getValue()));
-        }
-
+//        List<ViewResult.Row> bySuburbs = result.getRows();
+//        for (ViewResult.Row row : bySuburbs) {
+//            res.put(row.getKeyAsNode(), Integer.parseInt(row.getValue()));
+//        }
+//
         return res;
     }
 

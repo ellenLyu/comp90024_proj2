@@ -25,6 +25,10 @@ public class CovidDaoImpl{
     private static final Logger logger = LoggerFactory.getLogger(CovidDaoImpl.class);
 
 
+    /**
+     * ~ 2021/05/17
+     * @return
+     */
     public Map<String, Integer> getBeforeDailyCases() {
         ViewQuery query = new ViewQuery().designDocId("_design/example").viewName("get_daily_new").group(true);
         ViewResult result = covidBeforeDbConnector.queryView(query);
@@ -40,11 +44,14 @@ public class CovidDaoImpl{
             }
         }
 
-        System.out.println(res);
         return res;
     }
 
 
+    /**
+     * 2021/05/17~
+     * @return
+     */
     public Map<String, Integer> getDailyCases() {
         ViewQuery query = new ViewQuery().designDocId("_design/example")
                 .viewName("get_daily_new").group(true);
@@ -64,5 +71,15 @@ public class CovidDaoImpl{
         }
 
         return res;
+    }
+
+
+    public List<ViewResult.Row> getCasesPopulation(String date) {
+        ViewQuery query = new ViewQuery().designDocId("_design/example").viewName("by_date").key(date);
+
+        ViewResult result = covidDbConnector.queryView(query);
+        List<ViewResult.Row> byDate = result.getRows();
+
+        return byDate;
     }
 }

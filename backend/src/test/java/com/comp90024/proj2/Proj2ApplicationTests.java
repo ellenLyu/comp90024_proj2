@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.TimeZone;
 
 @SpringBootTest
@@ -25,7 +26,7 @@ class Proj2ApplicationTests {
 //	}
 //
 	@Test
-	public void testQuery() throws IOException, InterruptedException {
+	public void testQuery() throws IOException, InterruptedException, ParseException {
 
 //	    searchService.largeTweetBySuburbs("", "2016");
 //        pythonService.crawlCovid();
@@ -33,6 +34,7 @@ class Proj2ApplicationTests {
 //		searchService.getAll();
 //		searchService.tweetBySentiment();
 		searchService.getDailyNewCases();
+//		searchService.tweetBySentiment("", "");
 	}
 
 }

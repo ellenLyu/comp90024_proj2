@@ -23,7 +23,7 @@ public class ScheduleTasks {
 //  }
 
 //  @Scheduled(fixedDelay = 60 * 1000)
-  @Scheduled(cron = "0 45 13 * * ?", zone = "GMT+8:00")
+  @Scheduled(cron = "0 45 14 * * ?", zone = "GMT+8:00")
   private void crawlCovidCases() {
 
     logger.info("Scheduled task Crawl CovidCases is called");
@@ -34,7 +34,7 @@ public class ScheduleTasks {
     }
   }
 
-  @Scheduled(cron = "0 45 10 * * ?", zone = "GMT+8:00")
+//  @Scheduled(fixedDelay = 24 * 60 * 1000)
   private void crawlTweetSuburb() {
 
     logger.info("Scheduled task Crawl TweetSuburb is called");

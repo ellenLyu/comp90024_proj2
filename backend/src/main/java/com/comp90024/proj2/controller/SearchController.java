@@ -6,6 +6,7 @@ import com.comp90024.proj2.util.CommonResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -18,9 +19,9 @@ public class SearchController {
     public SearchServiceImpl searchService;
 
     @RequestMapping(value = "/covid_scatter", method = RequestMethod.POST)
-    public CommonResult getCovidScatter(@RequestBody JSONObject requestBody) {
+    public CommonResult getCovidScatter(@RequestBody JSONObject requestBody) throws ParseException {
 
-        List<List<Float>> result = searchService.groupByDate(requestBody.getString("data"));
+        List<Map<String, Object>> result = searchService.covidPopulation();
         return CommonResult.success(result, "success");
     }
 

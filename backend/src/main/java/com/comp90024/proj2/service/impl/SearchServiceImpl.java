@@ -9,10 +9,15 @@ import com.comp90024.proj2.view.LargeDaoImpl;
 import com.comp90024.proj2.view.TweetDaoImpl;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.ektorp.CouchDbConnector;
+import org.ektorp.ViewResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -36,18 +41,35 @@ public class SearchServiceImpl implements SearchService {
 
 
     @Override
-    public List<List<Float>> groupByDate(String date) {
-        List<List<Float>> result = new ArrayList<>();
+    public List<Map<String, Object>> covidPopulation() throws ParseException {
+        List<Map<String, Object>> result = new ArrayList<>();
 
-//        List<Covid> queryRes = covidDaoImpl.findBydata_date(date);
-//        System.out.println(queryRes);
-//        for (Covid c : queryRes) {
-//            System.out.println(c.get_id());
-//            List<Float> data = new ArrayList<>();
-//            data.add(StringUtils.isNotEmpty(c.getPopulation()) ? Float.parseFloat(c.getPopulation()) : 0);
-//            data.add(StringUtils.isNotEmpty(c.getCases()) ? Float.parseFloat(c.getCases()) : 0);
-//            result.add(data);
-//        }
+        LocalDateTime now = LocalDateTime.now();
+        Date key;
+        if (now.getHour() < 15) {
+            key = new SimpleDateFormat("yyyy-MM-dd").parse(String.valueOf(LocalDate.now().minusDays(2)));
+        } else {
+            key = new SimpleDateFormat("yyyy-MM-dd").parse(String.valueOf(LocalDate.now().minusDays(1)));
+        }
+
+//        Date key = new SimpleDateFormat("yyyy-MM-dd").parse("2021-05-19");
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+        List<ViewResult.Row> queryRes = covidDaoImpl.getCasesPopulation(format.format(key));
+
+        for (ViewResult.Row row : queryRes) {
+            JsonNode value = row.getValueAsNode();
+
+            Map<String, Object> data = new HashMap<>();
+
+            // data
+            data.put("data", Arrays.asList(StringUtils.isNotEmpty(value.get(0).asText()) ? Float.parseFloat(value.get(0).asText()) : 0,
+                    StringUtils.isNotEmpty(value.get(1).asText()) ? Float.parseFloat(value.get(1).asText()) : 0));
+            // color
+            data.put("color", "rgba(223, 83, 83, .5)");
+            // label
+            data.put("name", value.get(2));
+            result.add(data);
+        }
 
         return result;
     }
@@ -55,7 +77,7 @@ public class SearchServiceImpl implements SearchService {
     @Override
     public List<Map<String, Object>> tweetBySentiment(String suburb, String date) {
         List<Map<String, Object>> result = new ArrayList<>();
-//        Map<String, Integer> queryRes = tweetDaoImpl.findBySentiment();
+        Map<JsonNode, Integer> queryRes = largeDaoImpl.getSentiments();
 //
 //        for (String key : queryRes.keySet()) {
 //            if (!"total".equals(key)) {
@@ -117,9 +139,7 @@ public class SearchServiceImpl implements SearchService {
         Map<String, List<Object>> res = new LinkedHashMap<>();
 
         Map<String, Integer> beforeCases = covidDaoImpl.getBeforeDailyCases();
-        System.out.println(beforeCases);
         Map<String, Integer> cases = covidDaoImpl.getDailyCases();
-        System.out.println(cases);
 
         beforeCases.putAll(cases);
 
@@ -128,5 +148,6 @@ public class SearchServiceImpl implements SearchService {
 
         return res;
     }
+
 
 }
