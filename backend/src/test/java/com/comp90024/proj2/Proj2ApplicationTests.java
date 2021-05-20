@@ -17,21 +17,22 @@ class Proj2ApplicationTests {
 //    @Autowired
 //    PythonServiceImpl pythonService;
 //
-//	@Autowired
-//	SearchServiceImpl searchService;
-//
+	@Autowired
+	SearchServiceImpl searchService;
+
 //	@Test
 //	void contextLoads() {
 //	}
 //
-//	@Test
-//	public void testQuery() throws IOException, InterruptedException {
+	@Test
+	public void testQuery() throws IOException, InterruptedException {
 
 //	    searchService.largeTweetBySuburbs("", "2016");
 //        pythonService.crawlCovid();
 //		searchService.groupByDate("03/05/2021");
 //		searchService.getAll();
 //		searchService.tweetBySentiment();
-//	}
+		searchService.getDailyNewCases();
+	}
 
 }

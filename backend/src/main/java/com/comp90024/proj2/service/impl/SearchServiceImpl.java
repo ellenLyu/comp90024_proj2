@@ -13,9 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -23,12 +21,6 @@ import java.util.stream.Collectors;
 public class SearchServiceImpl implements SearchService {
 
     private static final Logger logger = Logger.getLogger(SearchServiceImpl.class.getName());
-
-    //    @Autowired
-//    private CouchDbConnector tweetDbConnector;
-//
-    @Autowired
-    private CouchDbConnector covidDbConnector;
 
     @Autowired
     private CovidDaoImpl covidDaoImpl;
@@ -47,37 +39,17 @@ public class SearchServiceImpl implements SearchService {
     public List<List<Float>> groupByDate(String date) {
         List<List<Float>> result = new ArrayList<>();
 
-//        CouchDbClient dbClient = new CouchDbClient();
-//
-//        List<Covid> queryRes = dbClient.view("example/by_date")
-//                .key(date)
-//                .includeDocs(true)
-//                .query(Covid.class);
-
-        List<Covid> queryRes = covidDaoImpl.findBydata_date(date);
-        System.out.println(queryRes);
-        for (Covid c : queryRes) {
-            System.out.println(c.get_id());
-            List<Float> data = new ArrayList<>();
-            data.add(StringUtils.isNotEmpty(c.getPopulation()) ? Float.parseFloat(c.getPopulation()) : 0);
-            data.add(StringUtils.isNotEmpty(c.getCases()) ? Float.parseFloat(c.getCases()) : 0);
-            result.add(data);
-        }
+//        List<Covid> queryRes = covidDaoImpl.findBydata_date(date);
+//        System.out.println(queryRes);
+//        for (Covid c : queryRes) {
+//            System.out.println(c.get_id());
+//            List<Float> data = new ArrayList<>();
+//            data.add(StringUtils.isNotEmpty(c.getPopulation()) ? Float.parseFloat(c.getPopulation()) : 0);
+//            data.add(StringUtils.isNotEmpty(c.getCases()) ? Float.parseFloat(c.getCases()) : 0);
+//            result.add(data);
+//        }
 
         return result;
-    }
-
-    @Override
-    public List<List<Float>> getAll() throws IOException {
-//        CovidDaoImpl covidDaoImpl = new CovidDaoImpl(covidDbConnector);
-
-        List<Covid> queryRes = covidDaoImpl.getAll();
-
-        for (Covid c : queryRes) {
-            System.out.println(c.get_id());
-        }
-
-        return null;
     }
 
     @Override
@@ -139,4 +111,22 @@ public class SearchServiceImpl implements SearchService {
 
         return queryRes;
     }
+
+    @Override
+    public Map<String, List<Object>> getDailyNewCases() {
+        Map<String, List<Object>> res = new LinkedHashMap<>();
+
+        Map<String, Integer> beforeCases = covidDaoImpl.getBeforeDailyCases();
+        System.out.println(beforeCases);
+        Map<String, Integer> cases = covidDaoImpl.getDailyCases();
+        System.out.println(cases);
+
+        beforeCases.putAll(cases);
+
+        res.put("categoryData", List.copyOf(beforeCases.keySet()));
+        res.put("valueData", List.copyOf(beforeCases.values()));
+
+        return res;
+    }
+
 }

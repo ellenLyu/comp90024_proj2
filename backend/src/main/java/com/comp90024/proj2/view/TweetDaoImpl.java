@@ -55,6 +55,4 @@ public class TweetDaoImpl extends CouchDbRepositorySupport<Tweet> {
 //        return res;
 //
 //    }
-
-
 }

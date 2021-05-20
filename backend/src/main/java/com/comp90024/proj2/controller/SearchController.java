@@ -3,7 +3,6 @@ package com.comp90024.proj2.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.comp90024.proj2.service.impl.SearchServiceImpl;
 import com.comp90024.proj2.util.CommonResult;
-import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,6 +47,15 @@ public class SearchController {
 
         return CommonResult.success(result, "success");
     }
+
+    @RequestMapping(value = "/daily_new", method = RequestMethod.POST)
+    public CommonResult getDailyNew(@RequestBody JSONObject requestBody) {
+
+        Map<String, List<Object>> result = searchService.getDailyNewCases();
+
+        return CommonResult.success(result, "success");
+    }
+
 
 
 }

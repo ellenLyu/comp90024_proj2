@@ -38,6 +38,18 @@ public class CouchDBConfig {
         return couchDbConnector;
     }
 
+
+    @Bean
+    @Autowired
+    public CouchDbConnector covidBeforeDbConnector(CouchDbInstance couchDbInstance,
+                                             @Value("${couchdb.database.covid.before}") String database) throws Exception {
+
+        CouchDbConnector couchDbConnector = new StdCouchDbConnector(database, couchDbInstance);
+        couchDbConnector.createDatabaseIfNotExists();
+
+        return couchDbConnector;
+    }
+
     @Bean
     @Autowired
     public CouchDbConnector tweetDbConnector(CouchDbInstance couchDbInstance,
