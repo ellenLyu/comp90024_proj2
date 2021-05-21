@@ -13,10 +13,20 @@ import os
 # access_token_secret = "3UdBzHvXXo1YvVehUkJG7BwYVuSxACd9sBccKlAUZgUza"
 
 ####ours
+import database
+
 consumer_key = 'rZFruNsPGW0dztpugftVGj837'
 consumer_secret = 'L6AzbTcwZZuJYWkBxt5mL7Ern7sKUxHuGyUqKE7WSql9vkRZNG'
 access_token = '1381264077268283393-otuXk0e8EVuw5BnrYbKpEuVDButxQI'
 access_token_secret = '9HMXSW6FzC24nlA1sccTaF8Wwypdh2KHbpxz2GT6jSB94'
+
+
+
+DB_AUTH = {"ADDRESS": "172.26.128.60", "PORT": "5984", "COUCHDB_USER": "admin", "COUCHDB_PASSWORD": "group27"}
+url = 'http://{0}:{1}@{2}:{3}/'.format(DB_AUTH["COUCHDB_USER"], DB_AUTH["COUCHDB_PASSWORD"],
+                                           DB_AUTH["ADDRESS"], DB_AUTH["PORT"])
+dbname = 'test_geo'
+db = database.Connection(url=url, database_name=dbname)
 
 
 
@@ -120,6 +130,7 @@ if __name__ == '__main__':
 
     twittercount = 0
     filename = 'tweet_geo.json'
+    tweets_list = []
     for suburb_name, geo_code in locate_dic.items():
         # print(suburb_name)
         # print()
@@ -138,7 +149,7 @@ if __name__ == '__main__':
         for tweet in tweets.items():
 
             twittercount+=1
-            #print(twittercount)
+            print(twittercount)
 
             # if twittercount==10:
             #     os.exit
@@ -148,12 +159,19 @@ if __name__ == '__main__':
                 # outfile.write(str(tweet._json).replace(u'\xa0', u''))
                 # json_str = js.dumps(tweet._json)
 
-                data = {}
-                data["tweet"] = tweet._json
-                data["suburb"] = suburb_name
-                data["geo_code"] = geo_code.split(":")[1].replace("\"","")
-                js.dump(data,outfile)
+                # data = {}
+                tweet_json = tweet._json
+                tweet_json["suburb"] = suburb_name
+                tweet_json["coordinate"] = geo_code.split(":")[1].replace("\"","")
+                # data["tweet"] = tweet._json
+                # data["suburb"] = suburb_name
+                # data["geo_code"] = geo_code.split(":")[1].replace("\"","")
+                tweets_list.append(tweet_json)
+                if len(tweets_list) == 100:
+                    db.insert_tweets(tweets_list)
+                    tweets_list = []
+                js.dump(tweet_json,outfile)
                 # outfile.write(json_str1)
                 outfile.write("\n")
-
+    db.insert_tweets(tweets_list)
     print("Crawl finished! data saved in " + filename)
