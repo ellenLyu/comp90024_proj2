@@ -9,12 +9,14 @@ public interface SearchService {
 
     List<Map<String, Object>> covidPopulation() throws IOException, ParseException;
 
-    List<Map<String, Object>> tweetBySentiment(String suburb, String date) throws IOException;
+    Map<String, Map<String, Integer>> tweetBySentiment(String year) throws IOException;
 
     Map<String, Integer> tweetBySuburbs() throws IOException;
 
     Map<?, Integer> largeTweetBySuburbs(String suburb, String date) throws IOException;
 
     Map<String, List<Object>> getDailyNewCases() throws IOException;
+
+    Map<String, List<Object>> getHashtags() throws IOException;
 
 }

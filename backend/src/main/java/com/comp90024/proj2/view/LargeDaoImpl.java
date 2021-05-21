@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,20 +56,26 @@ public class LargeDaoImpl extends CouchDbRepositorySupport<DemoTweet> {
 
 
     @View(name="sentiment_by_suburb_year")
-    public Map<JsonNode, Integer> getSentiments() {
-        Map<JsonNode, Integer> res = new HashMap<>();
+    public ViewResult getSentiments(String year) {
 
-        ViewQuery query = new ViewQuery().designDocId("_design/example").viewName("suburbs_year").group(true);
-        ViewResult result = db.queryView(query);
-        System.out.println(result);
+        ViewQuery query = new ViewQuery().designDocId("_design/example")
+                .viewName("sentiment_by_suburb_year")
+                .startKey(Arrays.asList(year, "a", "n"))
+                .endKey(Arrays.asList(year, "z", "p")).group(true);
 
-//        List<ViewResult.Row> bySuburbs = result.getRows();
-//        for (ViewResult.Row row : bySuburbs) {
-//            res.put(row.getKeyAsNode(), Integer.parseInt(row.getValue()));
-//        }
-//
-        return res;
+        return db.queryView(query);
     }
+
+//    @View(name="sentiment_by_suburb_year")
+//    public ViewResult getSentiments(String year) {
+//
+//        ViewQuery query = new ViewQuery().designDocId("_design/example")
+//                .viewName("sentiment_by_suburb_year")
+//                .startKey(Arrays.asList(year, "a", "n"))
+//                .endKey(Arrays.asList(year, "z", "p")).group(true);
+//
+//        return db.queryView(query);
+//    }
 
 
 

@@ -29,8 +29,8 @@ public class SearchController {
     @RequestMapping(value = "/tweet_sent_pie", method = RequestMethod.POST)
     public CommonResult getTweetSentiment(@RequestBody JSONObject requestBody) {
 
-        List<Map<String, Object>> result = searchService.tweetBySentiment(
-                requestBody.getString("suburb"), requestBody.getString("year"));
+        Map<String, Map<String, Integer>> result = searchService.tweetBySentiment(
+                requestBody.getString("year"));
         return CommonResult.success(result, "success");
     }
 
@@ -52,6 +52,14 @@ public class SearchController {
 
     @RequestMapping(value = "/daily_new", method = RequestMethod.POST)
     public CommonResult getDailyNew(@RequestBody JSONObject requestBody) {
+
+        Map<String, List<Object>> result = searchService.getDailyNewCases();
+
+        return CommonResult.success(result, "success");
+    }
+
+    @RequestMapping(value = "/get_hashtags", method = RequestMethod.POST)
+    public CommonResult getHashtags(@RequestBody JSONObject requestBody) {
 
         Map<String, List<Object>> result = searchService.getDailyNewCases();
 

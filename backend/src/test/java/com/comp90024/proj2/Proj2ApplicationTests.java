@@ -14,27 +14,27 @@ import java.util.TimeZone;
 
 @SpringBootTest
 class Proj2ApplicationTests {
-//
+
 //    @Autowired
 //    PythonServiceImpl pythonService;
 //
-	@Autowired
-	SearchServiceImpl searchService;
+//	@Autowired
+//	SearchServiceImpl searchService;
 
 //	@Test
 //	void contextLoads() {
 //	}
 //
-	@Test
-	public void testQuery() throws IOException, InterruptedException, ParseException {
+//	@Test
+//	public void testQuery() throws IOException, InterruptedException, ParseException {
 
 //	    searchService.largeTweetBySuburbs("", "2016");
-//        pythonService.crawlCovid();
+//        pythonService.crawlTweetGeo();
 //		searchService.groupByDate("03/05/2021");
 //		searchService.getAll();
-//		searchService.tweetBySentiment();
-		searchService.getDailyNewCases();
+//		searchService.tweetBySentiment("2014");
+//		searchService.getDailyNewCases();
 //		searchService.tweetBySentiment("", "");
-	}
+//	}
 
 }

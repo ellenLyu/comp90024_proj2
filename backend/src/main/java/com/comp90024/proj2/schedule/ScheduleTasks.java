@@ -39,7 +39,7 @@ public class ScheduleTasks {
 
     logger.info("Scheduled task Crawl TweetSuburb is called");
     try {
-      pythonService.crawlCovid();
+      pythonService.crawlTweetGeo();
     } catch (IOException | InterruptedException | NullPointerException e) {
       e.printStackTrace();
     }

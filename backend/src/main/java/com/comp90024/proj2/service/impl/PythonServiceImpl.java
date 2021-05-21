@@ -21,7 +21,7 @@ public class PythonServiceImpl implements PythonService {
     private String PY_PATH;
 
     @Override
-    public void crawlTweetGeo() throws IOException, InterruptedException {
+    public void crawlCovid() throws IOException, InterruptedException {
         String crawl = PY_PATH + "crawl_covid_cases.py";
         String insert2couch = PY_PATH + "connect_db.py";
 
@@ -33,7 +33,8 @@ public class PythonServiceImpl implements PythonService {
 
             System.out.println("filename: " + filename);
             String success = exec(insert2couch, "-mode", "csv", "-filename", filename,
-                    "-dbname", "large");
+                    "-dbname", "covidcases", "-keys", "postcode", "data_date");
+
 
             logger.info("Covid Cases " + filename + " has been updated to Couch DB");
         } else {
@@ -43,7 +44,7 @@ public class PythonServiceImpl implements PythonService {
 
 
     @Override
-    public void crawlCovid() throws IOException, InterruptedException {
+    public void crawlTweetGeo()  throws IOException, InterruptedException {
         String crawl = PY_PATH + "tweepy_geo.py";
         String insert2couch = PY_PATH + "connect_db.py";
 

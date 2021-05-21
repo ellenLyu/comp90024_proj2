@@ -1,6 +1,5 @@
 package com.comp90024.proj2.service.impl;
 
-import com.comp90024.proj2.entity.Covid;
 import com.comp90024.proj2.service.SearchService;
 import com.comp90024.proj2.util.StringUtils;
 import com.comp90024.proj2.view.CovidDaoImpl;
@@ -8,7 +7,6 @@ import com.comp90024.proj2.view.DemoDaoImpl;
 import com.comp90024.proj2.view.LargeDaoImpl;
 import com.comp90024.proj2.view.TweetDaoImpl;
 import com.fasterxml.jackson.databind.JsonNode;
-import org.ektorp.CouchDbConnector;
 import org.ektorp.ViewResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -75,18 +73,22 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public List<Map<String, Object>> tweetBySentiment(String suburb, String date) {
-        List<Map<String, Object>> result = new ArrayList<>();
-        Map<JsonNode, Integer> queryRes = largeDaoImpl.getSentiments();
-//
-//        for (String key : queryRes.keySet()) {
-//            if (!"total".equals(key)) {
-//                Map<String, Object> data = new HashMap<>();
-//                data.put("name", key);
-//                data.put("y", ((float) queryRes.get(key)) / queryRes.get("total"));
-//                result.add(data);
-//            }
-//        }
+    public Map<String, Map<String, Integer>> tweetBySentiment(String year) {
+        Map<String, Map<String, Integer>> result = new HashMap<>();
+        ViewResult queryRes = largeDaoImpl.getSentiments(year);
+
+        List<ViewResult.Row> bySuburbs = queryRes.getRows();
+        for (ViewResult.Row row : bySuburbs) {
+            JsonNode keyNode = row.getKeyAsNode();
+            Map<String, Integer> bySuburb;
+            if (!result.containsKey(keyNode.get(1).asText())) {
+                bySuburb = new HashMap<>();
+                result.put(keyNode.get(1).asText(), bySuburb);
+            } else {
+                bySuburb = result.get(keyNode.get(1).asText());
+            }
+            bySuburb.put(keyNode.get(2).asText(), Integer.parseInt(row.getValue()));
+        }
 
         return result;
     }
@@ -147,6 +149,11 @@ public class SearchServiceImpl implements SearchService {
         res.put("valueData", List.copyOf(beforeCases.values()));
 
         return res;
+    }
+
+    @Override
+    public Map<String, List<Object>> getHashtags() throws IOException {
+        return null;
     }
 
 
