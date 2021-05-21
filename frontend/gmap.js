@@ -147,6 +147,7 @@ function initMap() {
     }
 
     $("#year").change(refreshMap);
+
 }
 
 function loadMapShapes() {
@@ -157,10 +158,10 @@ function loadMapShapes() {
 
     dataLayer.setStyle(
         function (feature) {
-            let name = feature.getProperty('name');
+            let suburb = feature.getProperty('name');
             var color;
             if (typeof data.suburbs[selectedYear] !== 'undefined') {
-                color = getColor(data.suburbs[selectedYear][name]);
+                color = getColor(data.suburbs[selectedYear][suburb]);
             } else {
                 color = getColor(feature.getProperty('cartodb_id'));
             }
@@ -222,9 +223,9 @@ function mouseInToRegion(e) {
     e.feature.setProperty("state", "hover");
     
     // update the label
-    let name = e.feature.getProperty("name");
-    let count = data.suburbs[selectedYear][name];
-    $("#data-label").text(name);
+    let suburb = e.feature.getProperty("name");
+    let count = data.suburbs[selectedYear][suburb];
+    $("#data-label").text(suburb);
     $("#data-value").text(`${count} tweets`);
     document.getElementById("data-box").style.display = "block";
 }
@@ -241,20 +242,11 @@ function mouseOutOfRegion(e) {
 function clickOnRegion(e) {
     let feature = e.feature;
     infoWindow.setPosition(e.latLng);
-    let name = feature.getProperty("name");
-    let number = typeof data.suburbs[selectedYear][name] === 'undefined' ? 0 : data.suburbs[selectedYear][name];
-    console.log(`${name}: ${number}`);
-    // getTweetCounts(name);, year
-    infoWindow.setContent(`${name}: ${number}`);
-    infoWindow.open(map);
+    let suburb = feature.getProperty("name");
+    let count = typeof data.suburbs[selectedYear][suburb] === 'undefined' ? 0 : data.suburbs[selectedYear][suburb];
+    console.log(`${suburb}: ${count}`);
 
-    // let container = `<div id="chart1" style="width:600px; height:400px;"></div>`;
-
-    // var nodeFrame = document.createElement("div");
-    // nodeFrame.style.cssText  = "width:400px; height:600px;";
-
-    drawTweetCountChart(name);
-
+    showInfoWindow(suburb, selectedYear);
 }
 
 function make_base_auth(user, password) {
@@ -312,70 +304,120 @@ function upcaseSentence(text) {
     return words.join(" ");
 }
 
+function showInfoWindow(suburb, year) {
+    var nodeFrame = document.createElement('div');
+    nodeFrame.style.cssText = "width:300px; height: 600px;";
+
+    var label = document.createElement('h3');
+    var count = data.suburbs[year][suburb];
+    console.log(suburb, year, data.suburbs[year][suburb]);
+    console.log("show info window method: " + suburb);
+    label.innerText = `${suburb}: ${count} tweets`;
+    label.style.cssText = "text-align:center;";
+    nodeFrame.appendChild(label);
+
+    var countChart = drawTweetCountChart(suburb);
+    nodeFrame.appendChild(countChart);
+
+    var sentimentChart = drawSentimentPie(suburb);
+    nodeFrame.appendChild(sentimentChart);
+
+    infoWindow.setContent(nodeFrame);
+    infoWindow.open(map);
+}
+
 function drawTweetCountChart(suburb) {
     var node = document.createElement('div');
     node.setAttribute("id", "chart1");
     node.style.cssText = "width:300px; height:200px;";
 
-    if (typeof data.tweetCounts[suburb] === 'undefined') {
-        getTweetCounts(suburb);
-    }
-    let yearCounts = data.tweetCounts[suburb];
-
     var myChart = echarts.init(
         node, null, 
         // {height: parseInt(node.style.height) * 0.40 + "px"}
     );
-    var option = {
-        grid: {
-            top: "10%",
-        },
-        title: {
-            text: 'Past years tweets count',
-            textStyle: {
-                fontSize: 10,
-            }
-        },
-        tooltip: {},
-        legend: {
-            data:['Count']
-        },
-        xAxis: {
-            data: Object.keys(yearCounts),
-        },
-        yAxis: {
-            show: false,
-        },
-        series: [{
-            name: 'Year',
-            type: 'bar',
-            data: Object.values(yearCounts),
-        }],
-    };
-    myChart.setOption(option);
-    infoWindow.setContent(node);
-    infoWindow.open(map);
+    
+    if (typeof data.tweetCounts[suburb] === 'undefined') {
+        getTweetCounts(suburb, myChart);
+    } else {
+        let yearCounts = data.tweetCounts[suburb];
+        var option = {
+            grid: {
+                top: "10%",
+            },
+            title: {
+                text: 'Past years tweets count',
+                textStyle: {
+                    fontSize: 10,
+                }
+            },
+            tooltip: {},
+            legend: {
+                data:['Count']
+            },
+            xAxis: {
+                data: Object.keys(yearCounts),
+            },
+            yAxis: {
+                show: false,
+            },
+            series: [{
+                suburb: 'Year',
+                type: 'bar',
+                data: Object.values(yearCounts),
+            }],
+        };
+        myChart.setOption(option);
+    }
+    
+    // infoWindow.setContent(node);
+    // infoWindow.open(map);
+    return node;
 }
 
-function getTweetCounts(suburb) {
+function getTweetCounts(suburb, chart) {
+    chart.showLoading();
     $.ajax({
         url: "http://172.26.128.60:8080/search/large_by_suburbs",
-        async: false,
         type: "POST",
         dataType: "json",
         headers: {'Content-Type':'application/json'},
         data: JSON.stringify({"suburb": suburb.toLowerCase()}),
-        success: function(res) {
-            // suburbs = {};
-            // for (let [key, value] of Object.entries(res.data)) {
-            //     suburbs[upcaseSentence(key)] = value;
-            // }
-            console.log(res.data);
-            data.tweetCounts[suburb] = res.data;
-        },
-        error: function() {
-            console.log("error");
-        }
+    }).done(function(res) {
+        console.log(res.data);
+        data.tweetCounts[suburb] = res.data;
+        chart.hideLoading();
+
+        let yearCounts = data.tweetCounts[suburb];
+        var option = {
+            grid: {
+                top: "10%",
+            },
+            title: {
+                text: 'Past years tweets count',
+                left: 'center',
+                textStyle: {
+                    fontSize: 10,
+                }
+            },
+            tooltip: {},
+            legend: {
+                data:['Count']
+            },
+            xAxis: {
+                data: Object.keys(yearCounts),
+            },
+            yAxis: {
+                show: false,
+            },
+            series: [{
+                suburb: 'Year',
+                type: 'bar',
+                data: Object.values(yearCounts),
+            }],
+        };
+        chart.setOption(option);
+    }).fail(function() {
+        console.log("error");
     })
 }
 
@@ -439,9 +481,61 @@ function refreshMap() {
         styles: mapStyle,
     });
     infoWindow = new google.maps.InfoWindow({
-        maxHeight: "1000px",
+        maxHeight: "800px",
     });
     dataLayer.setMap(map);
+}
+
+function drawSentimentPie(suburb) {
+    var node = document.createElement('div');
+    node.setAttribute("id", "chart2");
+    node.style.cssText = "width:300px; height:200px;";
+    var myChart = echarts.init(node);
+    var option = {
+        title: {
+            text: '某站点用户访问来源',
+            subtext: '纯属虚构',
+            left: 'center',
+            textStyle: {
+                fontSize: 10,
+            }
+        },
+        tooltip: {
+            trigger: 'item'
+        },
+        // legend: {
+        //     orient: 'vertical',
+        //     left: 'left',
+        // },
+        series: [
+            {
+                name: '访问来源',
+                type: 'pie',
+                radius: '50%',
+                data: [
+                    {value: 1048, name: '搜索引擎'},
+                    {value: 735, name: '直接访问'},
+                    {value: 580, name: '邮件营销'},
+                ],
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                }
+            }
+        ]
+    };
+
+    myChart.setOption(option);
+    // infoWindow.setContent(node);
+    // infoWindow.open(map);
+    return node;
+}
+
+function getSentiment(suburb, year, chart) {
+    
 }
 
 initMap();
