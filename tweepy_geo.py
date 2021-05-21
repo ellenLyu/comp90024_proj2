@@ -138,7 +138,7 @@ if __name__ == '__main__':
         for tweet in tweets.items():
 
             twittercount+=1
-            print(twittercount)
+            #print(twittercount)
 
             # if twittercount==10:
             #     os.exit
