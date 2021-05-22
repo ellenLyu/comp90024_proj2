@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.comp90024.proj2.service.impl.SearchServiceImpl;
 import com.comp90024.proj2.util.CommonResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
@@ -66,6 +67,13 @@ public class SearchController {
         return CommonResult.success(result, "success");
     }
 
+    @RequestMapping(value = "/get_all_count", method = RequestMethod.POST)
+    public CommonResult getAllCount(@RequestBody JSONObject requestBody) {
+
+        Map<String, Integer> result = searchService.getAllCount();
+
+        return CommonResult.success(result, "success");
+    }
 
 
 }

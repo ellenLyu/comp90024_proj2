@@ -9,6 +9,8 @@ import com.comp90024.proj2.view.TweetDaoImpl;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.ektorp.ViewResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -24,6 +26,9 @@ import java.util.stream.Collectors;
 public class SearchServiceImpl implements SearchService {
 
     private static final Logger logger = Logger.getLogger(SearchServiceImpl.class.getName());
+
+    @Autowired
+    private Environment env;
 
     @Autowired
     private CovidDaoImpl covidDaoImpl;
@@ -156,5 +161,15 @@ public class SearchServiceImpl implements SearchService {
         return null;
     }
 
+    @Override
+    public Map<String, Integer> getAllCount() {
+        Map<String, Integer> res = new HashMap<>();
+
+        res.put(env.getProperty("couchdb.database.covid"), covidDaoImpl.getCovidAllCount());
+        res.put(env.getProperty("couchdb.database.covid.before"), covidDaoImpl.getCovidBeforeAllCount());
+        res.put(env.getProperty("couchdb.database.large"), largeDaoImpl.getAllCount());
+
+        return res;
+    }
 
 }

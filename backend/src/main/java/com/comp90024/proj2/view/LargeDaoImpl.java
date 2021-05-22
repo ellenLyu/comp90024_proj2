@@ -55,27 +55,28 @@ public class LargeDaoImpl extends CouchDbRepositorySupport<DemoTweet> {
     }
 
 
-    @View(name="sentiment_by_suburb_year")
+    @View(name="sentiment_by_year_suburb")
     public ViewResult getSentiments(String year) {
 
         ViewQuery query = new ViewQuery().designDocId("_design/example")
-                .viewName("sentiment_by_suburb_year")
+                .viewName("sentiment_by_year_suburb")
                 .startKey(Arrays.asList(year, "a", "n"))
                 .endKey(Arrays.asList(year, "z", "p")).group(true);
 
         return db.queryView(query);
     }
 
-//    @View(name="sentiment_by_suburb_year")
-//    public ViewResult getSentiments(String year) {
-//
-//        ViewQuery query = new ViewQuery().designDocId("_design/example")
-//                .viewName("sentiment_by_suburb_year")
-//                .startKey(Arrays.asList(year, "a", "n"))
-//                .endKey(Arrays.asList(year, "z", "p")).group(true);
-//
-//        return db.queryView(query);
-//    }
+    public Integer getAllCount() {
+        ViewQuery query = new ViewQuery().designDocId("_design/example").viewName("get_all_count");
+
+        ViewResult result = db.queryView(query);
+
+        if (result.getRows().get(0) != null) {
+            return result.getRows().get(0).getValueAsInt();
+        }
+
+        return 0;
+    }
 
 
 

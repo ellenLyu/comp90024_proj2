@@ -19,4 +19,6 @@ public interface SearchService {
 
     Map<String, List<Object>> getHashtags() throws IOException;
 
+    Map<String, Integer> getAllCount() throws IOException;
+
 }

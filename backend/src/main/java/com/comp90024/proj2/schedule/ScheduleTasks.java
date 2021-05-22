@@ -34,7 +34,7 @@ public class ScheduleTasks {
     }
   }
 
-//  @Scheduled(fixedDelay = 24 * 60 * 1000)
+  @Scheduled(fixedDelay = 24 * 60 * 1000)
   private void crawlTweetSuburb() {
 
     logger.info("Scheduled task Crawl TweetSuburb is called");

@@ -82,4 +82,29 @@ public class CovidDaoImpl{
 
         return byDate;
     }
+
+
+    public Integer getCovidAllCount() {
+        ViewQuery query = new ViewQuery().designDocId("_design/example").viewName("get_all_count");
+
+        ViewResult result = covidDbConnector.queryView(query);
+
+        if (result.getRows().get(0) != null) {
+            return result.getRows().get(0).getValueAsInt();
+        }
+
+        return 0;
+    }
+
+    public Integer getCovidBeforeAllCount() {
+        ViewQuery query = new ViewQuery().designDocId("_design/example").viewName("get_all_count");
+
+        ViewResult result = covidBeforeDbConnector.queryView(query);
+
+        if (result.getRows().get(0) != null) {
+            return result.getRows().get(0).getValueAsInt();
+        }
+
+        return 0;
+    }
 }
