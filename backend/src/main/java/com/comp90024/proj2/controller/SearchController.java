@@ -62,7 +62,7 @@ public class SearchController {
     @RequestMapping(value = "/get_hashtags", method = RequestMethod.POST)
     public CommonResult getHashtags(@RequestBody JSONObject requestBody) {
 
-        Map<String, List<Object>> result = searchService.getDailyNewCases();
+        Map<String, Map<String, Integer>> result = searchService.getHashtags(requestBody.getString("year"));
 
         return CommonResult.success(result, "success");
     }

@@ -62,8 +62,9 @@ public class PythonServiceImpl implements PythonService {
     }
 
     /**
-     *
-     * @param args
+     * Execute the python script with args
+     * @param pyFile filename
+     * @param args python args
      * @return
      */
     private String exec(String pyFile, String... args) {
@@ -97,6 +98,13 @@ public class PythonServiceImpl implements PythonService {
         }
     }
 
+    /**
+     * Create the ProcessBuilder to run python script
+     * @param pyFile filename
+     * @param args python args
+     * @return ProcessBuilder
+     * @throws IOException
+     */
     private ProcessBuilder build(String pyFile, String[] args) throws IOException {
 
         File directory = new File(PY_PATH);
@@ -116,6 +124,9 @@ public class PythonServiceImpl implements PythonService {
         return builder;
     }
 
+    /**
+     * ProcessStreamReadTask
+     */
     private static class ProcessStreamReadTask {
 
         private volatile String message = "";
@@ -156,9 +167,8 @@ public class PythonServiceImpl implements PythonService {
 
         /**
          * Convert InputStream to String
-         *
-         * @param inputStream
-         * @return
+         * @param inputStream inputStream from python
+         * @return String
          */
         private String convertToStr(InputStream inputStream) {
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
@@ -179,10 +189,7 @@ public class PythonServiceImpl implements PythonService {
                     e.printStackTrace();
                 }
             }
-
             return sb.toString();
         }
     }
-
-
 }

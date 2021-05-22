@@ -66,6 +66,19 @@ public class LargeDaoImpl extends CouchDbRepositorySupport<DemoTweet> {
         return db.queryView(query);
     }
 
+
+    @View(name="hashtags_by_year_suburb")
+    public ViewResult getHashtags(String year) {
+
+        ViewQuery query = new ViewQuery().designDocId("_design/example")
+                .viewName("hashtags_by_year_suburb")
+                .startKey(Arrays.asList(year, "a"))
+                .endKey(Arrays.asList(year, "z")).group(true);
+
+        return db.queryView(query);
+    }
+
+    @View(name="get_all_count")
     public Integer getAllCount() {
         ViewQuery query = new ViewQuery().designDocId("_design/example").viewName("get_all_count");
 

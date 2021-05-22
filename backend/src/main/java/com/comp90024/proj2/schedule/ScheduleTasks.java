@@ -22,7 +22,7 @@ public class ScheduleTasks {
 //    cleanLogs();
 //  }
 
-//  @Scheduled(fixedDelay = 60 * 1000)
+  // @Scheduled(fixedDelay = 60 * 1000)
   @Scheduled(cron = "0 45 14 * * ?", zone = "GMT+8:00")
   private void crawlCovidCases() {
 

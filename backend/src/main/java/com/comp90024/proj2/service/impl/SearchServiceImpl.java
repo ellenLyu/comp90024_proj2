@@ -157,8 +157,27 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public Map<String, List<Object>> getHashtags() throws IOException {
-        return null;
+    public Map<String, Map<String, Integer>> getHashtags(String year){
+        Map<String, Map<String, Integer>> result = new HashMap<>();
+        ViewResult queryRes = largeDaoImpl.getHashtags(year);
+
+        List<ViewResult.Row> byYear = queryRes.getRows();
+
+        for (ViewResult.Row row : byYear) {
+            JsonNode keyNode = row.getKeyAsNode();
+
+            Map<String, Integer> bySuburb;
+            if (!result.containsKey(keyNode.get(1).asText())) {
+                bySuburb = new HashMap<>();
+                result.put(keyNode.get(1).asText(), bySuburb);
+            } else {
+                bySuburb = result.get(keyNode.get(1).asText());
+            }
+
+            bySuburb.put(keyNode.get(2).asText(), Integer.parseInt(row.getValue()));
+        }
+
+        return result;
     }
 
     @Override
