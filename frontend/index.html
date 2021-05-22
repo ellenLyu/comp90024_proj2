@@ -7,7 +7,7 @@
     <link rel="stylesheet" type="text/css" href="./map-style.css">
 </head>
 
-<body>
+<body onload="initMap()">
     <h3>My Google Maps Demo</h3>
 
     <div id="data-box" class="nicebox">
@@ -27,7 +27,12 @@
         </select>
     </div>
 
-    <div id="map"></div>
+    <div id="map">
+        <div style="text-align:center">
+            Loading, Please wait...<br>
+            <img src="giphy.gif"/>
+        </div>
+    </div>
 
     <!--The div element for the map -->
     
