@@ -4,10 +4,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.comp90024.proj2.service.impl.SearchServiceImpl;
 import com.comp90024.proj2.util.CommonResult;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -59,10 +59,9 @@ public class SearchController {
         return CommonResult.success(result, "success");
     }
 
-    @RequestMapping(value = "/get_hashtags", method = RequestMethod.POST)
-    public CommonResult getHashtags(@RequestBody JSONObject requestBody) {
-
-        Map<String, Map<String, Integer>> result = searchService.getHashtags(requestBody.getString("year"));
+    @RequestMapping(value = "/get_hashtags", method = RequestMethod.GET)
+    public CommonResult getHashtags(String year) {
+        Map<String, LinkedHashMap<String, Integer>> result = searchService.getHashtags(year);
 
         return CommonResult.success(result, "success");
     }

@@ -27,13 +27,14 @@ public class PythonServiceImpl implements PythonService {
      */
     @Override
     public void crawlCovid() throws IOException, InterruptedException {
+        String filePath  = "output/";
         String crawl = PY_PATH + "crawl_covid_cases.py";
         String insert2couch = PY_PATH + "connect_db.py";
 
-        String filename = exec(crawl);
+        String filename = exec(crawl, "-path", filePath);
 
-        if (StringUtils.isNotEmpty(filename) && filename.contains("files/")) {
-            filename = filename.replaceAll("files/", "");
+        if (StringUtils.isNotEmpty(filename) && filename.contains(filePath)) {
+//            filename = filename.replaceAll(filePath, "");
             filename = filename.replaceAll("\n", "");
 
             System.out.println("filename: " + filename);

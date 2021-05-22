@@ -9,8 +9,11 @@ import com.comp90024.proj2.view.TweetDaoImpl;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.ektorp.ViewResult;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.core.env.Environment;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -23,6 +26,8 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Service
+@EnableCaching
+@EnableAsync(proxyTargetClass=true)
 public class SearchServiceImpl implements SearchService {
 
     private static final Logger logger = Logger.getLogger(SearchServiceImpl.class.getName());
@@ -157,8 +162,11 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public Map<String, Map<String, Integer>> getHashtags(String year){
-        Map<String, Map<String, Integer>> result = new HashMap<>();
+    @Cacheable(cacheNames = "hashtags", key = "#year")
+    public Map<String, LinkedHashMap<String, Integer>> getHashtags(String year) {
+        logger.info("getHashtags " + year);
+        Map<String, LinkedHashMap<String, Integer>> result = new HashMap<>();
+
         ViewResult queryRes = largeDaoImpl.getHashtags(year);
 
         List<ViewResult.Row> byYear = queryRes.getRows();
@@ -166,9 +174,9 @@ public class SearchServiceImpl implements SearchService {
         for (ViewResult.Row row : byYear) {
             JsonNode keyNode = row.getKeyAsNode();
 
-            Map<String, Integer> bySuburb;
+            LinkedHashMap<String, Integer> bySuburb;
             if (!result.containsKey(keyNode.get(1).asText())) {
-                bySuburb = new HashMap<>();
+                bySuburb = new LinkedHashMap<>();
                 result.put(keyNode.get(1).asText(), bySuburb);
             } else {
                 bySuburb = result.get(keyNode.get(1).asText());
@@ -176,6 +184,27 @@ public class SearchServiceImpl implements SearchService {
 
             bySuburb.put(keyNode.get(2).asText(), Integer.parseInt(row.getValue()));
         }
+
+         for (String suburb : result.keySet()) {
+             LinkedHashMap<String, Integer> bySuburb = result.get(suburb);
+             LinkedHashMap<String, Integer> sortedBySuburb = new LinkedHashMap<>();
+
+             bySuburb.entrySet().stream()
+                     .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                     .forEachOrdered(x -> sortedBySuburb.put(x.getKey(), x.getValue()));
+
+             bySuburb = new LinkedHashMap<>();
+             int count = 0;
+             for (Map.Entry<String, Integer> entry : sortedBySuburb.entrySet()) {
+                 bySuburb.put(entry.getKey(), entry.getValue());
+                 count++;
+                 if (count == 20) {
+                     result.put(suburb, bySuburb);
+                     break;
+                 }
+             }
+             result.put(suburb, bySuburb);
+         }
 
         return result;
     }
@@ -191,4 +220,8 @@ public class SearchServiceImpl implements SearchService {
         return res;
     }
 
+    @CacheEvict(cacheNames = "hashtags", allEntries = true)
+    public void clearCache() {
+        logger.info("Cache 'hashtags' has been cleared");
+    }
 }
