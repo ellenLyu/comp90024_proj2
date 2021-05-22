@@ -43,5 +43,6 @@ if __name__ == '__main__':
         db.insert_tweets(tweets_list=twitter_file['rows'])
     elif mode == 'csv':
         with open(FILE_PATH + filename, "r") as f:
+        with open(filename, "r") as f:
             csv_file = csv.reader(f)
             db.insert_dataset(file=csv_file, keys=keys)
