@@ -1,0 +1,4 @@
+tweepy
+CouchDB
+vaderSentiment
+bs4
