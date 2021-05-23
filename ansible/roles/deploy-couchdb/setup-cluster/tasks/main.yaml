@@ -1,0 +1,88 @@
+---
+# - name: Upload swarm file and couchdb config
+#   become: yes
+#   copy:
+#     src: couchdb-conf.ini
+#     dest: /home/ubuntu/
+#     mode: 0664
+#   copy:
+#     src: docker-swarm.yaml
+#     dest: /home/ubuntu/
+#     mode: 0664
+
+# - name: Leader node deploy couchdb
+#   become: yes
+#   shell: docker stack deploy -c {{couchdb_docker_swarm_file}} {{couchdb_stack}}
+
+
+
+
+- name: setup couchdb cluster | step 1
+  become: yes
+  uri:
+    url: http://{{couchdb_user}}:{{couchdb_password}}@{{ groups['leader'][0] }}:5984/_cluster_setup
+    status_code: 201
+    method: POST
+    user: "{{ couchdb_user }}"
+    password:  "{{ couchdb_password }}"
+    force_basic_auth: yes
+    return_content: yes
+    body_format: json
+    body: "{\"action\": \"enable_cluster\", \"bind_address\":\"0.0.0.0\",\
+            \"username\": \"{{ couchdb_user }}\", \"password\":\"{{ couchdb_password }}\", \"port\": \"5984\",\
+            \"remote_node\": \"{{ item }}\", \"node_count\": \"{{ groups['database'] | length }}\",\
+            \"remote_current_user\":\"{{ couchdb_user }}\", \"remote_current_password\":\"{{ couchdb_password }}\"}"
+    headers:
+      Content-Type: "application/json"
+    timeout: 240
+  register: request
+  until: request.status == 201
+  retries: 3
+  loop: "{{ groups['workers'] }}"
+
+- name: setup couchdb cluster | step 2
+  become: yes
+  uri:
+    url: http://{{couchdb_user}}:{{couchdb_password}}@{{ groups['leader'][0] }}:5984/_cluster_setup
+    # url: http://{{couchdb_user}}:{{couchdb_password}}@127.0.0.1:5984/_cluster_setup
+    status_code: 201, 409
+    method: POST
+    user: "{{ couchdb_user }}"
+    password:  "{{ couchdb_password }}"
+    force_basic_auth: yes
+    return_content: yes
+    body_format: json
+    method: POST
+    body: "{\"action\": \"add_node\", \"host\":\"{{ item }}\",\
+            \"port\": \"5984\", \"username\": \"{{ couchdb_user }}\", \"password\":\"{{ couchdb_password }}\"}"
+    headers:
+      Content-Type: "application/json"
+    timeout: 120    
+  loop: "{{ groups['workers'] }}"
+
+- name: steup couchdb cluster | step 3 -- get
+  uri:
+    url: http://{{couchdb_user}}:{{couchdb_password}}@{{ groups['leader'][0] }}:5984/
+    method: GET
+    return_content: yes
+    user: "{{ couchdb_user }}"
+    password:  "{{ couchdb_password }}"
+  
+- name: steup couchdb cluster | step 3 -- finish
+  uri:
+    url: http://{{couchdb_user}}:{{couchdb_password}}@{{ groups['leader'][0] }}:5984/_cluster_setup
+    status_code: 201, 400
+    method: POST
+    user: "{{ couchdb_user }}"
+    password:  "{{ couchdb_password }}"
+    force_basic_auth: yes
+    return_content: yes
+    body_format: json
+    method: POST
+    body: "{\"action\": \"finish_cluster\"}"
+    headers:
+      Content-Type: "application/json"
+    timeout: 120
+  register: request
+  until: request.status == 201 or request.json.reason == "Cluster is already finished"
+  retries: 3

@@ -1,0 +1,12 @@
+- hosts: localhost
+  vars_files:
+    - host_vars/local_vars.yaml
+  gather_facts: true
+
+  roles:
+    - role: create-instances/openstack-common
+    - role: create-instances/openstack-images
+    - role: create-instances/openstack-volume
+    - role: create-instances/openstack-security-group
+    - role: create-instances/openstack-instance
+    # - role: create-instances/openstack-volume-snapshot
