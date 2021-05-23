@@ -74,5 +74,13 @@ public class SearchController {
         return CommonResult.success(result, "success");
     }
 
+    @RequestMapping(value = "/get_abs", method = RequestMethod.POST)
+    public CommonResult getAbs(@RequestBody JSONObject requestBody) {
+
+        Map<String, Map<String, Map<String, Float>>> result = searchService.getAbs(requestBody.getString("year"));
+
+        return CommonResult.success(result, "success");
+    }
+
 
 }

@@ -82,4 +82,15 @@ public class CouchDBConfig {
 
         return couchDbConnector;
     }
+
+    @Bean
+    @Autowired
+    public CouchDbConnector absDbConnector(CouchDbInstance couchDbInstance,
+                                             @Value("${couchdb.database.abs}") String database) throws Exception {
+
+        CouchDbConnector couchDbConnector = new StdCouchDbConnector(database, couchDbInstance);
+        couchDbConnector.createDatabaseIfNotExists();
+
+        return couchDbConnector;
+    }
 }

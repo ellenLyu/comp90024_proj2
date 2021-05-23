@@ -22,4 +22,6 @@ public interface SearchService {
 
     Map<String, Integer> getAllCount() throws IOException;
 
+    Map<String, Map<String, Map<String, Float>>> getAbs(String year) throws IOException;
+
 }

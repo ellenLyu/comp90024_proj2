@@ -2,10 +2,7 @@ package com.comp90024.proj2.service.impl;
 
 import com.comp90024.proj2.service.SearchService;
 import com.comp90024.proj2.util.StringUtils;
-import com.comp90024.proj2.view.CovidDaoImpl;
-import com.comp90024.proj2.view.DemoDaoImpl;
-import com.comp90024.proj2.view.LargeDaoImpl;
-import com.comp90024.proj2.view.TweetDaoImpl;
+import com.comp90024.proj2.view.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.ektorp.ViewResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +43,9 @@ public class SearchServiceImpl implements SearchService {
 
     @Autowired
     private LargeDaoImpl largeDaoImpl;
+
+    @Autowired
+    private AbsDaoImpl absDaoImpl;
 
 
     @Override
@@ -216,8 +216,48 @@ public class SearchServiceImpl implements SearchService {
         res.put(env.getProperty("couchdb.database.covid"), covidDaoImpl.getCovidAllCount());
         res.put(env.getProperty("couchdb.database.covid.before"), covidDaoImpl.getCovidBeforeAllCount());
         res.put(env.getProperty("couchdb.database.large"), largeDaoImpl.getAllCount());
+        res.put(env.getProperty("couchdb.database.abs"), absDaoImpl.getAllCount());
+
 
         return res;
+    }
+
+    @Override
+    public Map<String, Map<String, Map<String, Float>>> getAbs(String year) {
+        Map<String, Map<String, Map<String, Float>>> result = new HashMap<>();
+
+        // Add the measures
+        result.put("Australian citizen (%)", new HashMap<>());
+        result.put("Speaks a Language Other Than English at Home (%)", new HashMap<>());
+        result.put("Median employee income ($)", new HashMap<>());
+        result.put("Completed Year 12 or equivalent (%)", new HashMap<>());
+
+        ViewResult queryRes = absDaoImpl.getAbsData(year);
+
+        List<ViewResult.Row> bySuburbs = queryRes.getRows();
+        for (ViewResult.Row row : bySuburbs) {
+            JsonNode keyNode = row.getKeyAsNode();
+            String measure = keyNode.get(2).asText();
+
+            if (!result.get(measure).containsKey(keyNode.get(1).asText())) {
+                result.get(measure).put(keyNode.get(1).asText(), new HashMap<>());
+            }
+
+            if ("Australian citizen (%)".equals(measure)) {
+                result.get(measure).get(keyNode.get(1).asText()).put("Australian", Float.parseFloat(row.getValue()));
+                result.get(measure).get(keyNode.get(1).asText()).put("International", 100 - Float.parseFloat(row.getValue()));
+            } else if (measure.endsWith("Speaks a Language Other Than English at Home (%)")) {
+                result.get(measure).get(keyNode.get(1).asText()).put("International", Float.parseFloat(row.getValue()));
+                result.get(measure).get(keyNode.get(1).asText()).put("English", 100 - Float.parseFloat(row.getValue()));
+            } else if (measure.endsWith("Completed Year 12 or equivalent (%)")) {
+                result.get(measure).get(keyNode.get(1).asText()).put("Completed", Float.parseFloat(row.getValue()));
+                result.get(measure).get(keyNode.get(1).asText()).put("Incomplete", 100 - Float.parseFloat(row.getValue()));
+            } else if (measure.endsWith("Median employee income ($)")) {
+                result.get(measure).get(keyNode.get(1).asText()).put("Median", Float.parseFloat(row.getValue()));
+            }
+        }
+
+        return result;
     }
 
     @CacheEvict(cacheNames = "hashtags", allEntries = true)
