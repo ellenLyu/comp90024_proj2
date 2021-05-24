@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Victory State Map</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="stylesheet" type="text/css" href="css/map-style.css">
+</head>
+
+<body onload="initMap()">
+
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+        <symbol id="check" viewBox="0 0 16 16">
+            <title>Check</title>
+            <path
+                d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z" />
+        </symbol>
+    </svg>
+
+
+    <div class="container py-3">
+        <header>
+            <div class="d-flex flex-column flex-md-row align-items-center pb-3 mb-4 border-bottom">
+                <a href="/" class="d-flex align-items-center text-dark text-decoration-none">
+
+                    <span class="fs-4">Group?? example</span>
+                </a>
+
+                <nav class="nav nav-masthead justify-content-center float-md-end ms-md-auto">
+                    <a class="nav-link" href="index.html">Home</a>
+                    <a class="nav-link" href="melb-maps.html">Melbourne Maps</a>
+                    <a class="nav-link active" href="vic-maps.html">Victoria Maps</a>
+                    <a class="nav-link" href="chart.html">Charts</a>
+                </nav>
+            </div>
+        </header>
+
+        <main>
+
+            <div><span>Year 2016</span></div>
+
+            <div id="data-box" class="nicebox">
+                <span id="data-value"></span>
+            </div>
+
+
+            <div id="map">
+                <div style="text-align:center">
+                    Loading, Please wait...<br>
+                    <img src="assets/giphy.gif" />
+                </div>
+            </div>
+        </main>
+
+    </div>
+
+    <!--The div element for the map -->
+
+    <!-- Async script executes immediately and must be after any DOM elements used in callback. -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDEjGjWfh_ueHvjenLHRt_Pg8KpN_eGPk4"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.1.1/dist/echarts.min.js"></script>
+    <script src="js/vic-maps.js"></script>
+
+</body>
+
+</html>
