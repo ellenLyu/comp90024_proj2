@@ -12,7 +12,7 @@ $.ajax({
         console.log(res.data);
         covidChart.setOption(option = {
             title: {
-                text: 'Daily increase in the number of coronaviruses in Australia from January 2020 to May 2021',
+                text: 'Daily increase in the number of coronaviruses in Australia from January 2020',
                 // left: '1%'
                 left: 'center',
                 textStyle: {
