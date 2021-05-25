@@ -1,0 +1,6 @@
+---
+- name: Start server
+  become: yes
+  command: docker-compose up --build -d
+  args:
+    chdir: /home/ubuntu/backend

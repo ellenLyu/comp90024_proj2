@@ -11,15 +11,6 @@
       no_proxy=localhost,127.0.0.1,localaddress,172.16.0.0/12,.melbourne.rc.nectar.org.au,.storage.unimelb.edu.au,.cloud.unimelb.edu.au
 
 
-# - name: make proxy available for current session
-#   become: yes
-#   shell: echo 'add proxy configuration success'
-#   environment:
-#     http_proxy: "{{ proxy_address }}"
-#     https_proxy: "{{ proxy_address }}"
-#     ftp_proxy: "{{ proxy_address }}"
-#     no_proxy: "localhost,127.0.0.1,localaddress,172.16.0.0/12,.melbourne.rc.nectar.org.au,.storage.unimelb.edu.au,.cloud.unimelb.edu.au"
-# # add proxy configuration
 - name: Reboot a machine
   become: yes
   reboot:

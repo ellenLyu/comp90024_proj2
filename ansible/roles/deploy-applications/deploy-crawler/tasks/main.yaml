@@ -1,0 +1,12 @@
+---
+- name: Stop docker compose python
+  become: yes
+  command: docker-compose down --rmi local
+  args:
+    chdir: '{{git_repository}}/crawl/'
+
+- name: Start docker service
+  become: yes
+  command: docker-compose up --build -d
+  args:
+    chdir: '{{git_repository}}/crawl/'

@@ -1,0 +1,6 @@
+---
+- name: Start server
+  become: yes
+  shell: docker-compose up --build -d
+  args:
+    chdir: "{{ git_repository }}/frontend"

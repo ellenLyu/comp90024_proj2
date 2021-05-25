@@ -1,0 +1,25 @@
+---
+- name: copy github ssh key
+  copy:
+    src: "config/githubKey"
+    dest: /home/ubuntu/.ssh/githubKey
+    mode: 0600
+
+- name: copy ssh config
+  copy:
+    src: "config/ssh_config"
+    dest: /home/ubuntu/.ssh/config
+    mode: 0644
+
+- name: Create repository directory
+  file:
+    path: '{{ git_repository }}'
+    state: directory
+    recurse: yes
+
+
+- name: git pull clone
+  git: 
+    repo: ssh://git@github.com/ellenLyu/comp90024_proj2.git
+    key_file: /home/ubuntu/.ssh/githubKey
+    dest: '{{ git_repository }}'
