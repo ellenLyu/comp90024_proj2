@@ -4,3 +4,4 @@ services:
         build: .
         volumes:
             - /home/ubuntu/log:/workspace/log
+        container_name: crawler
