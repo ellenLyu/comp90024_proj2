@@ -1,0 +1,9 @@
+version: "3"
+services:
+    web:
+        build: .
+        ports:
+            - '8080:80'
+        volumes:
+            - /home/ubuntu/log/nginx:/var/log/nginx
+        container_name: frontend
