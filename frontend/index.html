@@ -1,52 +1,113 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="h-100">
 
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="">
-  <title>Home</title>
+  <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+  <meta name="generator" content="Hugo 0.83.1">
+  <title>Team 27</title>
+
+  <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/cover/">
+
+
 
   <!-- Bootstrap core CSS -->
-  <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
-  <link rel="stylesheet" type="text/css" href="css/style.css">
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <!-- Custom styles for this template -->
+  <link href="css/cover.css" rel="stylesheet">
 </head>
 
-<body>
 
-  <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
-    <symbol id="check" viewBox="0 0 16 16">
-      <title>Check</title>
-      <path
-        d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z" />
-    </symbol>
-  </svg>
+<body class="d-flex h-100 text-center text-white bg-dark"
+  style='background-image: url("./imge/homebg.png"); background-position:top;'>
+  
 
-  <div class="container py-3">
-    <header class="mb-auto">
+  <div class="container d-flex w-100 h-100 p-3 mx-auto flex-column">
+    <!-- <div class="container py-3"> -->
+    <header >
+      <!-- <div> -->
       <div class="d-flex flex-column flex-md-row align-items-center pb-3 mb-4 border-bottom">
-        <a href="/" class="d-flex align-items-center text-dark text-decoration-none">
-          
-          <span class="fs-4">Group?? example</span>
-        </a>
 
+        <h3 class="float-md-start mb-0">Welcome </h3>
         <nav class="nav nav-masthead justify-content-center float-md-end ms-md-auto">
-          <a class="nav-link active" href="index.html">Home</a>
-          <a class="nav-link" href="melb-maps.html">Melbourne Maps</a>
-          <a class="nav-link" href="vic-maps.html">Victoria Maps</a>
-          <a class="nav-link" href="chart.html">Charts</a>
+          <a class="nav-link active" href="#">Home</a>
+          <a class="nav-link" href="melb-maps.html">Melbourne Map</a>
+          <a class="nav-link" href="vic-maps.html">Victoria Map</a>
+          <a class="nav-link" href="chart.html">Chart</a>
         </nav>
-
       </div>
     </header>
 
-
-    <main>
-
-
+    <main class="px-3">
+      <h1>Cloud twitter collect and analysis system</h1>
+      <p class="lead">Team 27</p>
+      <p class="lead">
+        <a href="vic-maps.html" class="btn btn-lg btn-secondary fw-bold border-white bg-white">Explore Vic Map</a>
+      </p>
     </main>
 
+    <div class="row">
+      <div class="col-lg-3">
+        <svg class="bd-placeholder-img rounded-circle" width="140" height="140" xmlns="http://www.w3.org/2000/svg"
+          role="img" aria-label="Placeholder: 140x140" preserveAspectRatio="xMidYMid slice" focusable="false">
+          <title>Placeholder</title>
+          <rect width="100%" height="100%" fill="#142D4E" /><text x="50%" y="50%" fill="#FFFFFF" dy=".3em"
+            id="abs_title">#####</text>
+        </svg>
+
+        <h2></h2>
+        <p>ABS</p>
+      </div><!-- /.col-lg-4 -->
+      <div class="col-lg-3">
+        <svg class="bd-placeholder-img rounded-circle" width="140" height="140" xmlns="http://www.w3.org/2000/svg"
+          role="img" aria-label="Placeholder: 140x140" preserveAspectRatio="xMidYMid slice" focusable="false">
+          <title>Placeholder</title>
+          <rect width="100%" height="100%" fill="#142D4E" /><text x="50%" y="50%" fill="#FFFFFF" dy=".3em"
+            id="large_title">#####</text>
+        </svg>
+
+        <h2></h2>
+        <p>Large</p>
+      </div><!-- /.col-lg-4 -->
+      <div class="col-lg-3">
+        <svg class="bd-placeholder-img rounded-circle" width="140" height="140" xmlns="http://www.w3.org/2000/svg"
+          role="img" aria-label="Placeholder: 140x140" preserveAspectRatio="xMidYMid slice" focusable="false">
+          <title>Placeholder</title>
+          <rect width="100%" height="100%" fill="#142D4E" /><text x="50%" y="50%" fill="#FFFFFF" dy=".3em"
+            id="tweets_title">#####</text>
+        </svg>
+
+        <h2></h2>
+        <p>Tweets</p>
+      </div><!-- /.col-lg-4 -->
+      <div class="col-lg-3">
+        <svg class="bd-placeholder-img rounded-circle" width="140" height="140" xmlns="http://www.w3.org/2000/svg"
+          role="img" aria-label="Placeholder: 140x140" preserveAspectRatio="xMidYMid slice" focusable="false">
+          <title>Placeholder</title>
+          <rect width="100%" height="100%" fill="#142D4E" /><text x="50%" y="50%" fill="#FFFFFF" dy=".3em"
+            id="covidcases_title">#####</text>
+        </svg>
+
+        <h2></h2>
+        <p>Covid Cases</p>
+      </div><!-- /.col-lg-4 -->
+
+
+
+    </div><!-- /.row -->
+
+    <footer class="mt-auto text-white-50">
+      <p>Cluster and Cloud Computing by <a href="https://github.com/ellenLyu/comp90024_proj2" class="text-white">Team 27
+          by team developers</a></p>
+    </footer>
   </div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.1.1/dist/echarts.min.js"></script>
+  <script src="js/home.js"></script>
 </body>
 
 </html>

@@ -1,6 +1,8 @@
 var covidDom = $("#covid-chart").get(0);
 var covidChart = echarts.init(covidDom);
 var covidOption;
+
+covidChart.showLoading();
 $.ajax({
     url: 'http://172.26.128.60:8080/search/daily_new',
     type: "POST",
@@ -10,6 +12,7 @@ $.ajax({
 }).done(function (res) {
         console.log("query finished");
         console.log(res.data);
+        covidChart.hideLoading();
         covidChart.setOption(option = {
             title: {
                 text: 'Daily increase in the number of coronaviruses in Australia from January 2020',
@@ -113,6 +116,7 @@ covidOption && covidChart.setOption(covidOption);
 var populationDom = $("#population-chart").get(0);
 var populationChart = echarts.init(populationDom);
 var populationOption;
+populationChart.showLoading();
 
 $.ajax({
     url: "http://172.26.128.60:8080/search/covid_scatter",
@@ -122,6 +126,7 @@ $.ajax({
     data: JSON.stringify({}),
 }).done(function(res) {
     console.log("request covid scatter finished");
+    populationChart.hideLoading();
     let option = {
         color: ['rgba(223, 83, 83, .5)'],
         title: {
