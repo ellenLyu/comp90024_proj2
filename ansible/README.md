@@ -18,3 +18,20 @@ password
 ./run-nectar.sh
 ```
 
+### 3. Install Environments
+
+```bash
+./install-environment.sh
+```
+
+### 4. Deploy CouchDB
+
+```bash
+./deploy-couchdb.sh
+```
+
+### 5. Deploy Applications
+
+```bash
+./deploy-application.sh
+```
