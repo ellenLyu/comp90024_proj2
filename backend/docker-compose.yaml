@@ -2,3 +2,8 @@ version: "3"
 services:
     backend:
         build: .
+        ports: 
+            - "8080:8080"
+        volumes:
+            - "/home/ubuntu/backend/volume1/log:/workspace/log"
+            - "/home/ubuntu/backend/volume1/output:/workspace/output"
