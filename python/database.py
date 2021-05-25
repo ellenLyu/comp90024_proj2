@@ -71,7 +71,8 @@ class Connection():
         row_idx = 0
         for row in file:
             if fields is None:
-                fields = row
+                fields = [field.replace('\ufeff"', "").replace('"', "") for field in row]
+
                 print(fields)
                 continue
             else:

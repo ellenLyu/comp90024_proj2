@@ -1,9 +1,11 @@
 package com.comp90024.proj2.service.impl;
 
 import com.comp90024.proj2.service.SearchService;
+import com.comp90024.proj2.util.Consts;
 import com.comp90024.proj2.util.StringUtils;
 import com.comp90024.proj2.view.*;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.tomcat.util.bcel.Const;
 import org.ektorp.ViewResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -20,6 +22,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -238,22 +242,29 @@ public class SearchServiceImpl implements SearchService {
         for (ViewResult.Row row : bySuburbs) {
             JsonNode keyNode = row.getKeyAsNode();
             String measure = keyNode.get(2).asText();
+            String suburb = keyNode.get(1).asText();
 
-            if (!result.get(measure).containsKey(keyNode.get(1).asText())) {
-                result.get(measure).put(keyNode.get(1).asText(), new HashMap<>());
+            // Extract the suburb name
+            Matcher m = Consts.SUBURB_PATTERN.matcher(suburb);
+            if (m.find()) {
+                suburb = m.group();
+            }
+
+            if (!result.get(measure).containsKey(suburb)) {
+                result.get(measure).put(suburb, new HashMap<>());
             }
 
             if ("Australian citizen (%)".equals(measure)) {
-                result.get(measure).get(keyNode.get(1).asText()).put("Australian", Float.parseFloat(row.getValue()));
-                result.get(measure).get(keyNode.get(1).asText()).put("International", 100 - Float.parseFloat(row.getValue()));
+                result.get(measure).get(suburb).put("Australian", Float.parseFloat(row.getValue()));
+                result.get(measure).get(suburb).put("International", 100 - Float.parseFloat(row.getValue()));
             } else if (measure.endsWith("Speaks a Language Other Than English at Home (%)")) {
-                result.get(measure).get(keyNode.get(1).asText()).put("International", Float.parseFloat(row.getValue()));
-                result.get(measure).get(keyNode.get(1).asText()).put("English", 100 - Float.parseFloat(row.getValue()));
+                result.get(measure).get(suburb).put("International", Float.parseFloat(row.getValue()));
+                result.get(measure).get(suburb).put("English", 100 - Float.parseFloat(row.getValue()));
             } else if (measure.endsWith("Completed Year 12 or equivalent (%)")) {
-                result.get(measure).get(keyNode.get(1).asText()).put("Completed", Float.parseFloat(row.getValue()));
-                result.get(measure).get(keyNode.get(1).asText()).put("Incomplete", 100 - Float.parseFloat(row.getValue()));
+                result.get(measure).get(suburb).put("Completed", Float.parseFloat(row.getValue()));
+                result.get(measure).get(suburb).put("Incomplete", 100 - Float.parseFloat(row.getValue()));
             } else if (measure.endsWith("Median employee income ($)")) {
-                result.get(measure).get(keyNode.get(1).asText()).put("Median", Float.parseFloat(row.getValue()));
+                result.get(measure).get(suburb).put("Median", Float.parseFloat(row.getValue()));
             }
         }
 
