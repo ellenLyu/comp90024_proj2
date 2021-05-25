@@ -18,7 +18,7 @@ api = tweepy.API(auth, wait_on_rate_limit=True)
 
 dbname = "tweets"
 melb_bbox = [144.33363404800002, -38.50298801599996, 145.8784120140001, -37.17509899299995]
-DB_AUTH = {"ADDRESS": "localhost", "PORT": "5984", "COUCHDB_USER": "admin", "COUCHDB_PASSWORD": "group27"}
+DB_AUTH = {"ADDRESS": "172.26.131.194", "PORT": "5984", "COUCHDB_USER": "admin", "COUCHDB_PASSWORD": "group27"}
 url = 'http://{0}:{1}@{2}:{3}/'.format(DB_AUTH["COUCHDB_USER"], DB_AUTH["COUCHDB_PASSWORD"],
                                         DB_AUTH["ADDRESS"], DB_AUTH["PORT"])
 db = database.Connection(url=url, database_name=dbname)
