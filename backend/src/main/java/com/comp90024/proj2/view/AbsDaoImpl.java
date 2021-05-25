@@ -1,3 +1,10 @@
+/*
+ * COMP90024: Cluster and Cloud Computing – Assignment 2
+ * 2021 semester 1
+ * Team 27
+ * City Analytics om the Cloud
+ */
+
 package com.comp90024.proj2.view;
 
 import com.comp90024.proj2.entity.DemoTweet;
@@ -47,4 +54,5 @@ public class AbsDaoImpl {
 
         return 0;
     }
+
 }

@@ -1,3 +1,10 @@
+/*
+ * COMP90024: Cluster and Cloud Computing – Assignment 2
+ * 2021 semester 1
+ * Team 27
+ * City Analytics om the Cloud
+ */
+
 package com.comp90024.proj2.service.impl;
 
 import com.comp90024.proj2.service.SearchService;
@@ -217,11 +224,11 @@ public class SearchServiceImpl implements SearchService {
     public Map<String, Integer> getAllCount() {
         Map<String, Integer> res = new HashMap<>();
 
-        res.put(env.getProperty("couchdb.database.covid"), covidDaoImpl.getCovidAllCount());
-        res.put(env.getProperty("couchdb.database.covid.before"), covidDaoImpl.getCovidBeforeAllCount());
+        res.put(env.getProperty("couchdb.database.covid"), covidDaoImpl.getCovidAllCount()
+                + covidDaoImpl.getCovidBeforeAllCount()) ;
+        res.put(env.getProperty("couchdb.database.tweets"), tweetDaoImpl.getAllCount());
         res.put(env.getProperty("couchdb.database.large"), largeDaoImpl.getAllCount());
         res.put(env.getProperty("couchdb.database.abs"), absDaoImpl.getAllCount());
-
 
         return res;
     }

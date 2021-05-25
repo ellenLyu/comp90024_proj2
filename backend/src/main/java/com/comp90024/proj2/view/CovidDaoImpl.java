@@ -1,8 +1,16 @@
+/*
+ * COMP90024: Cluster and Cloud Computing – Assignment 2
+ * 2021 semester 1
+ * Team 27
+ * City Analytics om the Cloud
+ */
+
 package com.comp90024.proj2.view;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import org.ektorp.CouchDbConnector;
+import org.ektorp.DbInfo;
 import org.ektorp.ViewQuery;
 import org.ektorp.ViewResult;
 import org.slf4j.Logger;
