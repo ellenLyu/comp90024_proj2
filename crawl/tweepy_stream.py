@@ -1,16 +1,7 @@
-import csv
 import sys
-
 import tweepy
-
-# Valid Key my
-# consumer_key = 'rZFruNsPGW0dztpugftVGj837'
-# consumer_secret = 'L6AzbTcwZZuJYWkBxt5mL7Ern7sKUxHuGyUqKE7WSql9vkRZNG'
-# access_token = '1381264077268283393-otuXk0e8EVuw5BnrYbKpEuVDButxQI'
-# access_token_secret = '9HMXSW6FzC24nlA1sccTaF8Wwypdh2KHbpxz2GT6jSB94'
-
-
-# override stream listener tweepy.StreamListener to add logic to on_status
+import database
+import json
 
 
 consumer_key = 'rAmNZM8q4JiRwk1wUKYhJ1Q0e'
@@ -24,17 +15,19 @@ auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
 api = tweepy.API(auth, wait_on_rate_limit=True)
 
-#create an object called 'customStreamListener'
+
+dbname = "tweets"
+melb_bbox = [144.33363404800002, -38.50298801599996, 145.8784120140001, -37.17509899299995]
+DB_AUTH = {"ADDRESS": "localhost", "PORT": "5984", "COUCHDB_USER": "admin", "COUCHDB_PASSWORD": "group27"}
+url = 'http://{0}:{1}@{2}:{3}/'.format(DB_AUTH["COUCHDB_USER"], DB_AUTH["COUCHDB_PASSWORD"],
+                                        DB_AUTH["ADDRESS"], DB_AUTH["PORT"])
+db = database.Connection(url=url, database_name=dbname)
+
 
 class CustomStreamListener(tweepy.StreamListener):
-
-    def on_status(self, status):
-        print (status.author.screen_name, status.created_at, status.text)
-        # Writing status data
-        # with open('OutputStreaming.txt', 'a') as f:
-        #     writer = csv.writer(f)
-        #     writer.writerow([status.author.screen_name, status.created_at, status.text])
-
+    def on_data(self, raw_data):
+        print(raw_data["text"])
+        db.insert_tweets([raw_data])
 
     def on_error(self, status_code):
         #print(status)
@@ -46,10 +39,7 @@ class CustomStreamListener(tweepy.StreamListener):
         print ( sys.stderr, 'Timeout...')
         return True # Don't kill the stream
 
-# Writing csv titles
-with open('OutputStreaming.txt', 'w') as f:
-    writer = csv.writer(f)
-    writer.writerow(['Author', 'Date', 'Text'])
 
-streamingAPI = tweepy.streaming.Stream(auth, CustomStreamListener())
-streamingAPI.filter(languages=["en"], locations=[112.28, -44.36, 155.23, -10.37])
+if __name__ == '__main__':
+    streamingAPI = tweepy.streaming.Stream(auth, CustomStreamListener())
+    streamingAPI.filter(languages=["en"], locations=melb_bbox)

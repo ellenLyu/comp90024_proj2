@@ -1,15 +1,21 @@
 import couchdb
 import re
+import json
 from couchdb import design
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
 
-class Connection:
-    BATCH_SIZE = 150
+class Connection():
+    BATCH_SIZE = 100
 
     def __init__(self, database_name, url):
         print(url)
         self.couch = couchdb.Server(url=url)
+
+        if database_name == 'covidcases':
+            with open('files/postcode_dict.json', 'r') as f:
+                self.postcode_dict = json.load(f)
+            # print(self.postcode_dict)
 
         try:
             self.couch_db_connector = self.couch[database_name]
@@ -20,6 +26,7 @@ class Connection:
     def insert_tweets(self, tweets_list, has_doc: bool = False):
         """
         Insert twitter file to database
+        :param has_doc:
         :param tweets_list: list of tweets in json format
         :param batch_size: the batch size
         :return:
@@ -61,13 +68,18 @@ class Connection:
         fields = None
         tmp_batch_list = []
 
+        row_idx = 0
         for row in file:
             if fields is None:
-                fields = row
+                fields = [field.replace('\ufeff"', "").replace('"', "") for field in row]
+
                 print(fields)
                 continue
             else:
-                doc = self.parse_csv(fields, row, keys=keys)
+                if 'row-index' in keys:
+                    doc = self.parse_csv(fields, row, keys=row_idx)
+                else:
+                    doc = self.parse_csv(fields, row, keys=keys)
 
                 if doc is not None:
                     tmp_batch_list.append(doc)
@@ -76,6 +88,8 @@ class Connection:
                     res = self.couch_db_connector.update(tmp_batch_list)
                     tmp_batch_list = []
                     print(res)
+
+            row_idx += 1
 
         if len(tmp_batch_list) != 0:
             res = self.couch_db_connector.update(tmp_batch_list)
@@ -108,6 +122,7 @@ class Connection:
     def parse_csv(self, fields: list, row, keys):
         """
         Parse the row in csv file into dict
+        :param keys:
         :param fields: cols list
         :param row: row data
         :return: dict with expected fields
@@ -116,10 +131,19 @@ class Connection:
             doc = dict(zip(fields, row))
 
             # Join the key for row
-            sid = '_'.join([row[fields.index(key)] for key in keys])
+            if type(keys) == int:
+                sid = 'idx_' + str(keys)
+            else:
+                sid = '_'.join([row[fields.index(key)] for key in keys])
             doc['_id'] = sid
 
-            # If the row does not exist in database, create the doc
+            if 'postcode' in fields:
+                if str(doc['postcode']) in self.postcode_dict:
+                    doc['Localgovernmentarea'] = self.postcode_dict[doc['postcode']]
+                else:
+                    doc['Localgovernmentarea'] = ''
+
+                    # If the row does not exist in database, create the doc
             if sid not in self.couch_db_connector:
                 return doc
             else:
@@ -135,58 +159,70 @@ class Connection:
     def parse_tweet(self, tweet, analyzer, has_doc: bool = False):
         """
         Parse the tweets into dict
+        :param has_doc:
         :param tweet: tweet data
         :return: dict with expected fields
         """
-        try:
-            doc = {}
-            if has_doc:
-                tweet_id = tweet['doc']['id_str']
+        doc = {}
+        if has_doc:
+            tweet_id = tweet['doc']['id_str']
+
+            if 'text' in tweet['doc']:
                 source_text = tweet['doc']['text']
-                created_at = tweet['doc']['created_at']
-                retweet_count = tweet['doc']['retweet_count']
-                favorite_count = tweet['doc']['favorite_count']
-                if tweet['doc']['coordinates']['coordinates'] != '':
-                    doc['coordinates'] = tweet['doc']['coordinates']['coordinates']
-                if tweet['doc']['entities']['hashtags']:
-                    doc['hashtags'] = tweet['doc']['entities']['hashtags']
             else:
-                tweet_id = tweet['id_str']
+                source_text = tweet['doc']['full_text']
+
+            created_at = tweet['doc']['created_at']
+            retweet_count = tweet['doc']['retweet_count']
+            favorite_count = tweet['doc']['favorite_count']
+            if tweet['doc']['coordinates']['coordinates'] != '':
+                doc['coordinates'] = tweet['doc']['coordinates']['coordinates']
+            if tweet['doc']['entities']['hashtags']:
+                doc['hashtags'] = tweet['doc']['entities']['hashtags']
+        else:
+            tweet_id = tweet['id_str']
+
+            if 'text' in tweet:
                 source_text = tweet['text']
-                created_at = tweet['created_at']
-                retweet_count = tweet['retweet_count']
-                favorite_count = tweet['favorite_count']
-                if tweet['coordinates']:
-                    doc['coordinates'] = tweet['coordinates']
+            else:
+                source_text = tweet['full_text']
+
+            created_at = tweet['created_at']
+            retweet_count = tweet['retweet_count']
+            favorite_count = tweet['favorite_count']
+
+            if 'coordinates' in tweet and tweet['coordinates'] is not None and 'coordinates' in tweet['coordinates']:
+                if tweet['coordinates']['coordinates'] != '':
+                    doc['coordinates'] = tweet['coordinates']['coordinates']
+            elif 'geo' in tweet and tweet['geo'] is not None and 'coordinates' in tweet['geo']:
+                if tweet['geo']['coordinates'] != '':
+                    doc['coordinates'] = tweet['geo']['coordinates']
+
+            if 'entities' in tweet:
                 if tweet['entities']['hashtags']:
                     doc['hashtags'] = tweet['entities']['hashtags']
 
+        # Get the sentiment
+        text = self.tweet_preprocessing(source_text)
+        compound = analyzer.polarity_scores(text)['compound']
+        sentiment = 'negative' if compound <= -0.05 else 'positive' if compound >= 0.05 else 'neutral'
 
-            # Get the sentiment
-            text = self.tweet_preprocessing(source_text)
-            compound = analyzer.polarity_scores(text)['compound']
-            sentiment = 'negative' if compound <= -0.05 else 'positive' if compound >= 0.05 else 'neutral'
+        if 'suburb' in tweet:
+            doc['suburb'] = tweet['suburb']
+        doc.update({
+            '_id': tweet_id, 'text': source_text, 'sentiment': sentiment,
+            'created_at': created_at, 'retweet_count': retweet_count, 'favorite_count': favorite_count,
+        })
+        # print(doc)
 
+        if tweet_id not in self.couch_db_connector:
+            return doc
+        else:
+            # Get the doc in database
+            ori_doc = dict(self.couch_db_connector[tweet_id])
 
-            if 'suburb' in tweet:
-                doc['suburb'] = tweet['suburb']
-            doc.update({
-                '_id': tweet_id, 'text': source_text, 'sentiment': sentiment,
-                'created_at': created_at, 'retweet_count': retweet_count, 'favorite_count': favorite_count,
-            })
-            # print(doc)
+            return self._compare_two_docs(doc=doc, ori_doc=ori_doc)
 
-            if tweet_id not in self.couch_db_connector:
-                return doc
-            else:
-                # Get the doc in database
-                ori_doc = dict(self.couch_db_connector[tweet_id])
-
-                return self._compare_two_docs(doc=doc, ori_doc=ori_doc)
-
-        except Exception as e:
-            print("Failed to parse tweet: ", str(e))
-            return None
 
     def tweet_preprocessing(self, text):
         """
@@ -199,7 +235,6 @@ class Connection:
         text = re.sub(r'@[A-Za-z0-9]+', '', text)
 
         return text
-
 
     def _compare_two_docs(self, doc: dict, ori_doc: dict):
         """
@@ -219,3 +254,4 @@ class Connection:
         else:
             # Otherwise, do not perform update
             return None
+
