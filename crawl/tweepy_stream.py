@@ -2,6 +2,7 @@ import sys
 import tweepy
 import database
 import json
+import time
 
 
 consumer_key = 'rAmNZM8q4JiRwk1wUKYhJ1Q0e'
@@ -48,4 +49,5 @@ if __name__ == '__main__':
             streamingAPI.filter(languages=["en"], locations=melb_bbox)
         except Exception as e:
             print(e)
+            time.sleep(10 * 60 + 1)
             continue
