@@ -1,0 +1,62 @@
+# Common vars
+availability_zone: melbourne-qh2-uom
+instance_image: f8b79936-6616-4a22-b55d-0d0a1d27bceb
+instance_key_name: demo-auth
+
+# Volume
+volumes:
+  - vol_name: volume_db1
+    vol_size: 80
+    device: /dev/vdb
+    mountpoint: /data
+  - vol_name: volume_db2
+    vol_size: 80
+    device: /dev/vdb
+    mountpoint: /data
+  - vol_name: volume_db3
+    vol_size: 80
+    device: /dev/vdb
+    mountpoint: /data
+  - vol_name: volume_ml
+    vol_size: 80
+    device: /dev/vdb
+    mountpoint: /data
+
+# Security group
+security_groups:
+  - name: demo_ssh
+    description: "Demo security group for SSH access"
+    protocol: tcp
+    port_range_min: 22
+    port_range_max: 22
+    remote_ip_prefix: 0.0.0.0/0
+  - name: demo_http
+    description: "Demo security group for HTTP"
+    protocol: tcp
+    port_range_min: 80
+    port_range_max: 80
+    remote_ip_prefix: 0.0.0.0/0
+  # - name: security_group
+  #   description: "security group for all instance server"
+  #   rules:
+  #     - name: 'Any'
+  #       protocol: tcp
+  #       port_range_min: 1
+  #       port_range_max: 65535
+  #       remote_ip_prefix: 0.0.0.0/0
+
+# Instance
+instances:
+  - name: instance-1
+    volumes: ["volume_db1"]
+    flavor: uom.mse.2c9g
+  - name: instance-2
+    volumes: ["volume_db2"]
+    flavor: uom.mse.2c9g
+  - name: instance-3
+    volumes: ["volume_db3"]
+    flavor: uom.mse.2c9g
+  - name: instance-4
+    volumes: ["volume_ml"]
+    flavor: uom.mse.1c4g
+

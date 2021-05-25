@@ -1,0 +1,25 @@
+---
+- name: Get docker info
+  become: yes
+  shell: docker info
+  register: docker_info
+
+- name: Create leader node of docker swarm cluster
+  block: 
+    - name: Leader node docker swarm init
+      shell: docker swarm init --advertise-addr {{groups['leader'][0]}}
+
+    - name: Get docker swarm worker token
+      shell: docker swarm join-token -q worker
+      register: worker_token
+
+    - name: Add tokens to dummy host, to be shared between multiple hosts
+      add_host:
+        name: swarm_token
+        worker_token: "{{worker_token.stdout}}"
+
+    - name: Output token
+      debug:
+        msg: "{{worker_token.stdout}}"
+  when: "docker_info.stdout.find('Swarm: inactive') != -1"
+  become: yes

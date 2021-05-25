@@ -1,0 +1,11 @@
+---
+- name: Get docker info
+  become: yes
+  shell: docker info
+  register: docker_info
+
+- name: Join as worker node
+  become: yes
+  shell: docker swarm join --token {{ hostvars['swarm_token']['worker_token'] }} {{groups['leader'][0]}}:2377
+  # conditional execute, if true, execute, or skip
+  when: "docker_info.stdout.find('Swarm: inactive') != -1"
