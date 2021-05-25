@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <title>Charts</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="stylesheet" type="text/css" href="css/map-style.css">
+</head>
+
+<body>
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+        <symbol id="check" viewBox="0 0 16 16">
+            <title>Check</title>
+            <path
+                d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z" />
+        </symbol>
+    </svg>
+
+
+    <div class="container py-3">
+        <header>
+            <div class="d-flex flex-column flex-md-row align-items-center pb-3 mb-4 border-bottom">
+                <a href="/" class="d-flex align-items-center text-dark text-decoration-none">
+                    
+                    <span class="fs-4">Group?? example</span>
+                </a>
+
+                <nav class="nav nav-masthead justify-content-center float-md-end ms-md-auto">
+                    <a class="nav-link" href="index.html">Home</a>
+                    <a class="nav-link" href="melb-maps.html">Melbourne Maps</a>
+                    <a class="nav-link" href="vic-maps.html">Victoria Maps</a>
+                    <a class="nav-link active" href="chart.html">Charts</a>
+                </nav>
+            </div>
+        </header>
+
+        <div id="covid-chart" style="min-width:400px;height:400px"></div>
+        <div id="population-chart" style="min-width:400px;height:400px"></div>
+
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.1.1/dist/echarts.min.js"></script>
+    <script src="js/chart.js"></script>
+
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+<!-- chart part -->
