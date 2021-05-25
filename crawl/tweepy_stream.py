@@ -37,10 +37,15 @@ class CustomStreamListener(tweepy.StreamListener):
         return True # Don't kill the stream
 
     def on_timeout(self):
-        print ( sys.stderr, 'Timeout...')
+        print(sys.stderr, 'Timeout...')
         return True # Don't kill the stream
 
 
 if __name__ == '__main__':
     streamingAPI = tweepy.streaming.Stream(auth, CustomStreamListener())
-    streamingAPI.filter(languages=["en"], locations=melb_bbox)
+    while True:
+        try:
+            streamingAPI.filter(languages=["en"], locations=melb_bbox)
+        except Exception as e:
+            print(e)
+            continue
